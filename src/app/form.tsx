@@ -9,22 +9,17 @@ import {
   FormLabel,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
-export const formSchema = z.object({
-  name: z.string().min(1),
-  phoneNumber: z.string().min(1),
-  email: z.string().email().min(1),
-})
-
-export type FormValues = z.infer<typeof formSchema>
+export type FormValues = {
+  name: string
+  phoneNumber: string
+  email: string
+}
 
 const MainForm = () => {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-  })
+  const form = useForm<FormValues>()
 
   function onSubmit(values: FormValues) {
     // Do something with the form values.
@@ -36,6 +31,7 @@ const MainForm = () => {
     handleSubmit,
     formState: { errors },
   } = form
+  console.log(errors)
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -67,7 +63,13 @@ const MainForm = () => {
             <FormField
               control={form.control}
               name="phoneNumber"
-              rules={{ required: 'Phone number is required' }}
+              rules={{
+                required: 'Phone number is required',
+                validate: (val) =>
+                  isValidPhoneNumber(val, 'AU')
+                    ? true
+                    : 'This field must be a valid AU phone number',
+              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
@@ -90,10 +92,18 @@ const MainForm = () => {
             <FormField
               control={form.control}
               name="email"
-              rules={{ required: 'Email is required' }}
+              rules={{
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'invalid email address',
+                },
+              }}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>
+                    Email{' '}
+                    <span className="text-md text-gray-500">(optional)</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       id="email"

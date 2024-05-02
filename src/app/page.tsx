@@ -1,8 +1,3 @@
-import { createServerClient } from '@/utils/supabase'
-import { cookies } from 'next/headers'
-import Link from 'next/link'
-
-import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -10,67 +5,35 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import MainForm from './form'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
+import Image from 'next/image'
 
 export default async function Index() {
-  const cookieStore = cookies()
-
-  const canInitSupabaseClient = () => {
-    // This function is just for the interactive tutorial.
-    // Feel free to remove it once you have Supabase connected.
-    try {
-      createServerClient(cookieStore)
-      return true
-    } catch (e) {
-      return false
-    }
-  }
-
-  const isSupabaseConnected = canInitSupabaseClient()
-
   return (
-    <Card className="mx-auto max-w-sm">
-      <CardHeader>
-        <CardTitle className="text-2xl">Queue Up</CardTitle>
-        <CardDescription>
-          Enter your email below to login to your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <Link href="#" className="ml-auto inline-block text-sm underline">
-                Forgot your password?
-              </Link>
-            </div>
-            <Input id="password" type="password" required />
-          </div>
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
-          <Button variant="outline" className="w-full">
-            Login with Google
-          </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{' '}
-          <Link href="#" className="underline">
-            Sign up
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">
+      <h1 className="self-start text-3xl font-extrabold">HaiDiLao Queue</h1>
+      <img
+        fill
+        src="https://storage.fantuan.ca/fantuan/au/default/blob/ced89be74ba0463198110a755f4eb527/1678660559899275264."
+        alt="Restaurant banner"
+        className="rounded-lg object-cover"
+      />
+      <Card className="mx-auto w-full">
+        <CardHeader>
+          <CardTitle className="text-2xl">Queue Up</CardTitle>
+          <CardDescription>
+            Enter your details below to enter the queue!
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <MainForm />
+        </CardContent>
+      </Card>
+      <p className="self-start justify-self-end text-sm text-gray-500">
+        Powered by <span className="underline">SwiftQu</span> - Virtusl Queues
+        Made Easy
+      </p>
+    </div>
   )
 }

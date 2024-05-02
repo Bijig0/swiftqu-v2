@@ -1,10 +1,10 @@
-import { GeistSans } from 'geist/font/sans'
-import ThemeProvider from '@/providers/ThemeProvider'
-import NextTopLoader from 'nextjs-toploader'
-import { Analytics } from '@vercel/analytics/react'
-import './globals.css'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import ReactQueryProvider from '@/providers/ReactQueryProvider'
+import ThemeProvider from '@/providers/ThemeProvider'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Analytics } from '@vercel/analytics/react'
+import { GeistSans } from 'geist/font/sans'
+import NextTopLoader from 'nextjs-toploader'
+import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -25,14 +25,14 @@ export default function RootLayout({
     <html
       lang="en"
       className={GeistSans.className}
-      style={{ colorScheme: 'dark' }}
+      // style={{ colorScheme: 'dark' }}
     >
-      <body className="bg-background text-foreground">
+      <body className="text-foreground">
         <NextTopLoader showSpinner={false} height={2} color="#2acf80" />
         <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
+          // attribute="class"
+          // defaultTheme="dark"
+          // enableSystem
           disableTransitionOnChange
         >
           <ReactQueryProvider>

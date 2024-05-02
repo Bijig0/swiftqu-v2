@@ -1,10 +1,17 @@
-import AuthButton from '@/components/AuthButton'
-import ConnectSupabaseSteps from '@/components/ConnectSupabaseSteps'
-import SignUpUserSteps from '@/components/SignUpUserSteps'
-import Header from '@/components/Header'
-import { cookies } from 'next/headers'
 import { createServerClient } from '@/utils/supabase'
-import ThemeToggle from '@/components/ThemeToggle'
+import { cookies } from 'next/headers'
+import Link from 'next/link'
+
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export default async function Index() {
   const cookieStore = cookies()
@@ -23,35 +30,47 @@ export default async function Index() {
   const isSupabaseConnected = canInitSupabaseClient()
 
   return (
-    <div className="flex w-full flex-1 flex-col items-center gap-20">
-      <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10">
-        <div className="flex w-full max-w-4xl items-center justify-between p-3 text-sm">
-          {isSupabaseConnected && <AuthButton />}
+    <Card className="mx-auto max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-2xl">Queue Up</CardTitle>
+        <CardDescription>
+          Enter your email below to login to your account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <div className="flex items-center">
+              <Label htmlFor="password">Password</Label>
+              <Link href="#" className="ml-auto inline-block text-sm underline">
+                Forgot your password?
+              </Link>
+            </div>
+            <Input id="password" type="password" required />
+          </div>
+          <Button type="submit" className="w-full">
+            Login
+          </Button>
+          <Button variant="outline" className="w-full">
+            Login with Google
+          </Button>
         </div>
-      </nav>
-
-      <div className="flex max-w-4xl flex-1 flex-col gap-20 px-3">
-        <Header />
-        <main className="flex flex-1 flex-col gap-6">
-          <h2 className="mb-4 text-4xl font-bold">Next steps</h2>
-          {isSupabaseConnected ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-        </main>
-      </div>
-
-      <footer className="w-full justify-center border-t border-t-foreground/10 p-8 text-center text-xs">
-        <p className="mb-6">
-          Powered by{' '}
-          <a
-            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-            target="_blank"
-            className="font-bold hover:underline"
-            rel="noreferrer"
-          >
-            Supabase
-          </a>
-        </p>
-        <ThemeToggle />
-      </footer>
-    </div>
+        <div className="mt-4 text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link href="#" className="underline">
+            Sign up
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

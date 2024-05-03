@@ -1,4 +1,4 @@
-import { FormValues } from '@/app/form'
+'use client'
 import createChatToken from '@/app/serverActions/handleVerifyOtp'
 import resendOTP from '@/app/serverActions/resendOTP'
 import checkOTPVerified from '@/app/serverActions/verifyOTP'

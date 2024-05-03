@@ -13,7 +13,6 @@ import { isValidPhoneNumber } from 'libphonenumber-js'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useSocketId } from './queue-utils/useSocketId'
-import joinQueue from './serverActions/joinQueue'
 import Urls from './urls/urls'
 
 export type FormValues = {
@@ -42,11 +41,23 @@ const MainForm = (props: Props) => {
   async function onSubmit(values: FormValues) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log({ socketId })
+    // console.log({ socketId })
 
-    await joinQueue(companyId, values.phoneNumber)
+    // await joinQueue(companyId, values.phoneNumber)
 
-    router.push(Urls.otp(companyId))
+    const cleanPhoneNumber = (phoneNumber: string): string =>
+      phoneNumber.replace(/\D/g, '')
+
+    const phoneNumber = cleanPhoneNumber(values.phoneNumber)
+
+    const addQueryParam = (url: string, param: string, value: string) =>
+      `${url}?${param}=${value}`
+
+    const baseUrl = Urls.otp(companyId)
+
+    const url = addQueryParam(baseUrl, 'phoneNumber', phoneNumber)
+
+    router.push(url)
     console.log(values)
   }
 

@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Heading } from 'lucide-react'
 import { z } from 'zod'
 
 const paramsSchema = z.object({
@@ -22,17 +23,15 @@ export default async function Index(params: unknown) {
   } = paramsSchema.parse(params)
   return (
     <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">
-      <h1 className="self-start text-3xl font-extrabold">
-        {companyId} Waiting Room
-      </h1>
+      <Heading>{companyId} Waiting Room</Heading>
       <img
         src="https://storage.fantuan.ca/fantuan/au/default/blob/ced89be74ba0463198110a755f4eb527/1678660559899275264."
         alt="Restaurant banner"
-        className="rounded-lg object-cover"
+        className="object-cover rounded-lg"
       />
-      <Card className="mx-auto flex w-full items-center justify-center">
+      <Card className="flex items-center justify-center w-full mx-auto">
         <CardContent className="flex items-center justify-center py-16">
-          <h1 className="font-primary-medium text-center text-5xl font-bold sm:text-6xl">
+          <h1 className="text-5xl font-bold text-center font-primary-medium sm:text-6xl">
             3rd{' '}
             <span className="block text-lg font-light text-gray-500">
               in queue
@@ -40,7 +39,7 @@ export default async function Index(params: unknown) {
           </h1>
         </CardContent>
       </Card>
-      <div className="flex w-full justify-evenly gap-4">
+      <div className="flex w-full gap-4 justify-evenly">
         <Button size={'lg'} className="flex-1 bg-blue-600">
           Chat With Us
         </Button>
@@ -64,7 +63,7 @@ export default async function Index(params: unknown) {
         </AccordionItem>
       </Accordion>
 
-      <p className="self-start justify-self-end text-sm text-gray-500">
+      <p className="self-start text-sm text-gray-500 justify-self-end">
         Powered by <span className="underline">SwiftQu</span> - Virtusl Queues
         Made Easy
       </p>

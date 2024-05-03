@@ -48,6 +48,7 @@
     "clsx": "^2.1.0",
     "embla-carousel-react": "^8.0.2",
     "geist": "^1.0.0",
+    "input-otp": "^1.2.4",
     "invariant": "^2.2.4",
     "libphonenumber-js": "^1.10.61",
     "lucide-react": "^0.304.0",

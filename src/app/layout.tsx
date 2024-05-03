@@ -1,3 +1,4 @@
+import AppPusherProvider from '@/providers/AppPusherProvider'
 import ReactQueryProvider from '@/providers/ReactQueryProvider'
 import ThemeProvider from '@/providers/ThemeProvider'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -5,7 +6,6 @@ import { Analytics } from '@vercel/analytics/react'
 import { GeistSans } from 'geist/font/sans'
 import NextTopLoader from 'nextjs-toploader'
 import './globals.css'
-import AppPusherProvider from '@/providers/AppPusherProvider'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -38,7 +38,7 @@ export default function RootLayout({
         >
           <AppPusherProvider>
             <ReactQueryProvider>
-              <main className="flex min-h-screen flex-col items-center">
+              <main className="flex min-h-screen flex-col">
                 {children}
                 <Analytics />{' '}
                 {/* ^^ remove this if you are not deploying to vercel. See more at https://vercel.com/docs/analytics  */}

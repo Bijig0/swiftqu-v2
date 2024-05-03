@@ -23,7 +23,7 @@ export type FormValues = {
 }
 
 type Props = {
-  companyId: string
+  companyId: number
 }
 
 const MainForm = (props: Props) => {
@@ -46,7 +46,7 @@ const MainForm = (props: Props) => {
 
     await joinQueue(companyId, values.phoneNumber)
 
-    router.push(Urls.queue(companyId))
+    router.push(Urls.otp(companyId))
     console.log(values)
   }
 

@@ -26,6 +26,6 @@
     "types.d.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"
-  ],
+, "src/app/api/queueDetails"  ],
   "exclude": ["node_modules", ".next", "out"]
 }

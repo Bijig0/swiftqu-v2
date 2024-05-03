@@ -24,7 +24,8 @@
     "prepare": "husky install",
     "test": "jest",
     "test:ci": "jest --ci",
-    "analyze": "ANALYZE=true pnpm build"
+    "analyze": "ANALYZE=true pnpm build",
+    "update-types": "npx supabase gen types typescript --project-id scrmsjlquvjrygoyfvko --schema public > src/app/types/supabase.ts"
   },
   "dependencies": {
     "@harelpls/use-pusher": "^7.2.1",
@@ -42,6 +43,7 @@
     "@vercel/analytics": "^1.1.1",
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
+    "clicksend": "^5.0.79",
     "clsx": "^2.1.0",
     "geist": "^1.0.0",
     "libphonenumber-js": "^1.10.61",
@@ -49,6 +51,7 @@
     "next": "^14.1.0",
     "next-themes": "^0.2.1",
     "nextjs-toploader": "^1.6.4",
+    "pusher": "^5.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.51.3",

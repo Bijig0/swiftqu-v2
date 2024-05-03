@@ -1,4 +1,7 @@
+import { FormValues } from '@/app/form'
+import createChatToken from '@/app/serverActions/handleVerifyOtp'
 import resendOTP from '@/app/serverActions/resendOTP'
+import checkOTPVerified from '@/app/serverActions/verifyOTP'
 import Urls from '@/app/urls/urls'
 import { Button } from '@/components/ui/button'
 import {
@@ -8,6 +11,7 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import Link from 'next/link'
+import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const paramsSchema = z.object({
@@ -18,33 +22,54 @@ const paramsSchema = z.object({
 
 type Params = z.infer<typeof paramsSchema>
 
+type FormValues = {
+  otpCode: string
+}
+
 const Otp = (params: unknown) => {
   const {
     params: { companyId },
   } = paramsSchema.parse(params)
 
+  const onVerifyOTP = async (values: FormValues) => {
+    const otpCode = values.otpCode
+    const chatToken = await createChatToken()
+    console.log({ chatToken })
+    const isVerified = await checkOTPVerified(phoneNumber, otpCode)
+    console.log({ isVerified })
+  }
+
+  const { control, handleSubmit } = useForm<FormValues>()
+
   return (
     <form
-      // action={verifyOTP}
+      onSubmit={handleSubmit(onVerifyOTP)}
       className="flex flex-col items-center justify-center px-8 py-16 sm:max-w-md"
     >
       <h1 className="text-xl font-bold">
         We've sent a one-time password to your phone
       </h1>
       <div className="my-4" />
-      <InputOTP maxLength={6}>
-        <InputOTPGroup>
-          <InputOTPSlot className="h-14 w-14" index={0} />
-          <InputOTPSlot className="h-14 w-14" index={1} />
-          <InputOTPSlot className="h-14 w-14" index={2} />
-        </InputOTPGroup>
-        <InputOTPSeparator />
-        <InputOTPGroup>
-          <InputOTPSlot className="h-14 w-14" index={3} />
-          <InputOTPSlot className="h-14 w-14" index={4} />
-          <InputOTPSlot className="h-14 w-14" index={5} />
-        </InputOTPGroup>
-      </InputOTP>
+      <Controller
+        name="otpCode"
+        control={control}
+        defaultValue=""
+        render={({ field: { onChange, value } }) => (
+          <InputOTP maxLength={6} onChange={onChange} value={value}>
+            <InputOTPGroup>
+              <InputOTPSlot className="h-14 w-14" index={0} />
+              <InputOTPSlot className="h-14 w-14" index={1} />
+              <InputOTPSlot className="h-14 w-14" index={2} />
+            </InputOTPGroup>
+            <InputOTPSeparator />
+            <InputOTPGroup>
+              <InputOTPSlot className="h-14 w-14" index={3} />
+              <InputOTPSlot className="h-14 w-14" index={4} />
+              <InputOTPSlot className="h-14 w-14" index={5} />
+            </InputOTPGroup>
+          </InputOTP>
+        )}
+      />
       <div className="my-2" />
       <button onClick={resendOTP} className="self-end text-blue-400">
         Resend Code

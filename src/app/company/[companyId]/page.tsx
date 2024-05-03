@@ -10,7 +10,7 @@ import MainForm from '../../form'
 
 const paramsSchema = z.object({
   params: z.object({
-    companyName: z.string(),
+    companyId: z.number(),
   }),
 })
 
@@ -18,7 +18,7 @@ type Params = z.infer<typeof paramsSchema>
 
 export default async function Index(params: unknown) {
   const {
-    params: { companyName },
+    params: { companyId },
   } = paramsSchema.parse(params)
   return (
     <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">
@@ -36,7 +36,7 @@ export default async function Index(params: unknown) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <MainForm companyName={companyName} />
+          <MainForm companyId={companyId} />
         </CardContent>
       </Card>
       <p className="self-start justify-self-end text-sm text-gray-500">

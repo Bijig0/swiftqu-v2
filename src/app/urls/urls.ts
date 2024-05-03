@@ -1,6 +1,6 @@
 const Urls = {
   home: '/',
-  queue: (companyName: string) => `/queue/${companyName}`,
+  queue: (companyId: number) => `/queue/${companyId}`,
 }
 
 export default Urls

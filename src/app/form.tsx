@@ -12,6 +12,8 @@ import { Input } from '@/components/ui/input'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { useSocketId } from './queue-utils/useSocketId'
+import joinQueue from './serverActions/joinQueue'
 import Urls from './urls/urls'
 
 export type FormValues = {
@@ -21,18 +23,22 @@ export type FormValues = {
 }
 
 type Props = {
-  companyName: string
+  companyId: number
 }
 
 const MainForm = (props: Props) => {
-  const { companyName } = props
+  const { companyId } = props
   const form = useForm<FormValues>()
   const router = useRouter()
+  const socketId = useSocketId()
 
-  function onSubmit(values: FormValues) {
+  async function onSubmit(values: FormValues) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    router.push(Urls.queue(companyName))
+
+    await joinQueue(companyId, values.phoneNumber)
+
+    router.push(Urls.queue(companyId))
     console.log(values)
   }
 

@@ -10,7 +10,7 @@ import { z } from 'zod'
 
 const paramsSchema = z.object({
   params: z.object({
-    companyName: z.string(),
+    companyId: z.string(),
   }),
 })
 
@@ -18,12 +18,12 @@ type Params = z.infer<typeof paramsSchema>
 
 export default async function Index(params: unknown) {
   const {
-    params: { companyName },
+    params: { companyId },
   } = paramsSchema.parse(params)
   return (
     <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">
       <h1 className="self-start text-3xl font-extrabold">
-        {companyName} Waiting Room
+        {companyId} Waiting Room
       </h1>
       <img
         src="https://storage.fantuan.ca/fantuan/au/default/blob/ced89be74ba0463198110a755f4eb527/1678660559899275264."

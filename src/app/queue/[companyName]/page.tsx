@@ -1,10 +1,11 @@
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { z } from 'zod'
 
 const paramsSchema = z.object({
@@ -21,21 +22,48 @@ export default async function Index(params: unknown) {
   } = paramsSchema.parse(params)
   return (
     <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">
-      <h1 className="self-start text-3xl font-extrabold">HaiDiLao Queue</h1>
+      <h1 className="self-start text-3xl font-extrabold">
+        {companyName} Waiting Room
+      </h1>
       <img
         src="https://storage.fantuan.ca/fantuan/au/default/blob/ced89be74ba0463198110a755f4eb527/1678660559899275264."
         alt="Restaurant banner"
         className="rounded-lg object-cover"
       />
-      <Card className="mx-auto w-full">
-        <CardHeader>
-          <CardTitle className="text-2xl">Queue Up</CardTitle>
-          <CardDescription>
-            Enter your details below to enter the queue!
-          </CardDescription>
-        </CardHeader>
-        <CardContent></CardContent>
+      <Card className="mx-auto flex w-full items-center justify-center">
+        <CardContent className="flex items-center justify-center py-16">
+          <h1 className="font-primary-medium text-center text-5xl font-bold sm:text-6xl">
+            3rd{' '}
+            <span className="block text-lg font-light text-gray-500">
+              in queue
+            </span>
+          </h1>
+        </CardContent>
       </Card>
+      <div className="flex w-full justify-evenly gap-4">
+        <Button size={'lg'} className="flex-1 bg-blue-600">
+          Chat With Us
+        </Button>
+        <Button size="lg" className="flex-1 bg-red-700 hover:bg-red-800 ">
+          Leave Queue
+        </Button>
+      </div>
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem className="no-underline" value="item-1">
+          <AccordionTrigger className="no-underline">
+            More Info
+          </AccordionTrigger>
+          <AccordionContent>
+            <ul className=" ml-6 list-disc [&>li]:mt-2">
+              <li>4 people ahead of you</li>
+              <li>16 people behind you</li>
+              <li>21 people in line</li>
+              <li>Estimated witing time: 10 - 15 minutes</li>
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
       <p className="self-start justify-self-end text-sm text-gray-500">
         Powered by <span className="underline">SwiftQu</span> - Virtusl Queues
         Made Easy

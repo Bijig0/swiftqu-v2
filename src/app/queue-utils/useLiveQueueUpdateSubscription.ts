@@ -1,11 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
+import { actionType } from '../types/types'
 import useJoinQueue from './useJoinQueue'
 import useLeaveQueue from './useLeaveQueue'
-import { useChannel, useEvent } from '@harelpls/use-pusher'
-import { actionType } from '../types/types'
 import { useSocketId } from './useSocketId'
+import { useChannel } from '@/use-pusher/useChannel'
+import { useEvent } from '@/use-pusher/useEvent'
 
 // client sends: company_id + action_type
 

@@ -1,5 +1,5 @@
-import { usePusher } from '@harelpls/use-pusher'
-import { useRef } from 'react'
+import { usePusher } from '@/use-pusher/usePusher'
+import { useEffect, useState } from 'react'
 
 /**
  * Provides access to the pusher client instance.
@@ -13,14 +13,16 @@ import { useRef } from 'react'
  */
 export function useSocketId() {
   const pusher = usePusher()
-  const socketRef = useRef<string>()
-  const connectionState = pusher.client?.connection.state
-  if (connectionState !== 'connected')
-    throw new Error(
-      `Cannot get socket id, not connected to pusher, connection state is ${connectionState}`,
-    )
-  const socketId = pusher.client?.connection.socket_id
-  if (!socketId) throw new Error('Cannot get socket id')
-  socketRef.current = socketId
-  return socketRef.current
+  const [socketId, setSocketId] = useState<string | undefined>(undefined)
+  console.log({ pusher })
+  const connectionState = pusher.client?.connection?.state
+  useEffect(() => {
+    console.log({ connectionState })
+    const socketId = pusher.client?.connection?.socket_id
+    console.log({ socketId })
+    if (connectionState !== 'connected') return
+    console.log({ connectionState })
+    setSocketId(socketId)
+  }, [connectionState])
+  return socketId
 }

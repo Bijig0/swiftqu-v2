@@ -23,7 +23,7 @@ export type FormValues = {
 }
 
 type Props = {
-  companyId: number
+  companyId: string
 }
 
 const MainForm = (props: Props) => {
@@ -32,9 +32,17 @@ const MainForm = (props: Props) => {
   const router = useRouter()
   const socketId = useSocketId()
 
+  // const pusher = initPusher()
+
+  // var channel = pusher.subscribe('my-channel')
+  // channel.bind('my-event', function (data) {
+  //   alert(JSON.stringify(data))
+  // })
+
   async function onSubmit(values: FormValues) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    console.log({ socketId })
 
     await joinQueue(companyId, values.phoneNumber)
 

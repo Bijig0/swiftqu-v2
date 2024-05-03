@@ -10,7 +10,7 @@ import MainForm from '../../form'
 
 const paramsSchema = z.object({
   params: z.object({
-    companyId: z.number(),
+    companyId: z.string(),
   }),
 })
 

@@ -10,7 +10,9 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { isValidPhoneNumber } from 'libphonenumber-js'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import Urls from './urls/urls'
 
 export type FormValues = {
   name: string
@@ -18,12 +20,19 @@ export type FormValues = {
   email: string
 }
 
-const MainForm = () => {
+type Props = {
+  companyName: string
+}
+
+const MainForm = (props: Props) => {
+  const { companyName } = props
   const form = useForm<FormValues>()
+  const router = useRouter()
 
   function onSubmit(values: FormValues) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    router.push(Urls.queue(companyName))
     console.log(values)
   }
 

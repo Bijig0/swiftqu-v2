@@ -1,5 +1,4 @@
 'use client'
-import createChatToken from '@/app/serverActions/handleVerifyOtp'
 import resendOTP from '@/app/serverActions/resendOTP'
 import checkOTPVerified from '@/app/serverActions/verifyOTP'
 import Urls from '@/app/urls/urls'
@@ -11,6 +10,7 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -26,15 +26,23 @@ type FormValues = {
   otpCode: string
 }
 
+const phoneNumberSchema = z.string()
+
 const Otp = (params: unknown) => {
   const {
     params: { companyId },
   } = paramsSchema.parse(params)
 
+  const searchParams = useSearchParams()
+
+  const phoneNumber = phoneNumberSchema.parse(searchParams.get('phoneNumber'))
+
+  console.log({ phoneNumber })
+
   const onVerifyOTP = async (values: FormValues) => {
     const otpCode = values.otpCode
-    const chatToken = await createChatToken()
-    console.log({ chatToken })
+    // const chatToken = await createChatToken()
+    // console.log({ chatToken })
     const isVerified = await checkOTPVerified(phoneNumber, otpCode)
     console.log({ isVerified })
   }

@@ -13,6 +13,7 @@ import { isValidPhoneNumber } from 'libphonenumber-js'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useSocketId } from './queue-utils/useSocketId'
+import sendOTP from './serverActions/sendOTP'
 import Urls from './urls/urls'
 
 export type FormValues = {
@@ -56,6 +57,8 @@ const MainForm = (props: Props) => {
     const baseUrl = Urls.otp(companyId)
 
     const url = addQueryParam(baseUrl, 'phoneNumber', phoneNumber)
+
+    sendOTP(phoneNumber)
 
     router.push(url)
     console.log(values)

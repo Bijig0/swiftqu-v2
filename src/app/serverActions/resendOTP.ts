@@ -1,6 +1,6 @@
 'use server'
 
-import { createServerClient } from '@/utils/supabase'
+import { createServerClient } from '@/utils/supabase/supabase'
 import { cookies } from 'next/headers'
 
 export default async function resendOTP() {

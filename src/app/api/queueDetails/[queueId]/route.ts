@@ -1,5 +1,5 @@
 import { Tables } from '@/app/types/supabase'
-import { createServerClient } from '@/utils/supabase'
+import { createServerClient } from '@/utils/supabase/supabase'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 

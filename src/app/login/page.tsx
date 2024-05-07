@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { headers, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createServerClient } from '@/utils/supabase'
+import { createServerClient } from '@/utils/supabase/supabase'
 
 export default function Login({
   searchParams,
@@ -53,10 +53,10 @@ export default function Login({
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md">
+    <div className="flex flex-col justify-center flex-1 w-full gap-2 px-8 sm:max-w-md">
       <Link
         href="/"
-        className="bg-btn-background hover:bg-btn-background-hover group absolute left-8 top-8 flex items-center rounded-md px-4 py-2 text-sm text-foreground no-underline"
+        className="absolute flex items-center px-4 py-2 text-sm no-underline rounded-md bg-btn-background hover:bg-btn-background-hover group left-8 top-8 text-foreground"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +68,7 @@ export default function Login({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1"
+          className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1"
         >
           <polyline points="15 18 9 12 15 6" />
         </svg>{' '}
@@ -76,14 +76,14 @@ export default function Login({
       </Link>
 
       <form
-        className="flex w-full flex-1 flex-col justify-center gap-2 text-foreground animate-in"
+        className="flex flex-col justify-center flex-1 w-full gap-2 text-foreground animate-in"
         action={signIn}
       >
         <label className="text-md" htmlFor="email">
           Email
         </label>
         <input
-          className="mb-6 rounded-md border bg-inherit px-4 py-2"
+          className="px-4 py-2 mb-6 border rounded-md bg-inherit"
           name="email"
           placeholder="you@example.com"
           required
@@ -92,23 +92,23 @@ export default function Login({
           Password
         </label>
         <input
-          className="mb-6 rounded-md border bg-inherit px-4 py-2"
+          className="px-4 py-2 mb-6 border rounded-md bg-inherit"
           type="password"
           name="password"
           placeholder="••••••••"
           required
         />
-        <button className="mb-2 rounded-md bg-green-700 px-4 py-2 text-foreground">
+        <button className="px-4 py-2 mb-2 bg-green-700 rounded-md text-foreground">
           Sign In
         </button>
         <button
           formAction={signUp}
-          className="mb-2 rounded-md border border-foreground/20 px-4 py-2 text-foreground"
+          className="px-4 py-2 mb-2 border rounded-md border-foreground/20 text-foreground"
         >
           Sign Up
         </button>
         {searchParams?.message && (
-          <p className="mt-4 bg-foreground/10 p-4 text-center text-foreground">
+          <p className="p-4 mt-4 text-center bg-foreground/10 text-foreground">
             {searchParams.message}
           </p>
         )}

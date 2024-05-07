@@ -1,7 +1,7 @@
 'use server'
-import { createServerClient } from '@/utils/supabase'
 import { cookies } from 'next/headers'
 import { serverClient } from '../queue-utils/utils/getstream'
+import { createServerClient } from '@/utils/supabase/supabase'
 
 const createChatToken = async () => {
   const supabase = createServerClient(cookies())

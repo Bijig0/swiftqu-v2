@@ -1,8 +1,9 @@
 const Urls = {
   home: '/',
-  queue: (companyId: number) => `/queue/${companyId}`,
-  otp: (companyId: number) => `/otp/${companyId}`,
-  company: (companyId: number) => `/company/${companyId}`,
+  queue: (companySlug: string) => `/queue/${companySlug}`,
+  otp: `/otp`,
+  company: (companySlug: string) => `/company/${companySlug}`,
+  emailVerifyOTP: `/verifyEmail`,
 }
 
 export default Urls

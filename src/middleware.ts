@@ -1,15 +1,20 @@
+import { updateSession } from '@/utils/supabase/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
-import { createMiddlewareClient } from '@/utils/supabase'
+import { createMiddlewareClient } from './utils/supabase/supabase'
 
 export async function middleware(request: NextRequest) {
   try {
     // This `try/catch` block is only here for the interactive tutorial.
     // Feel free to remove once you have Supabase connected.
+    console.log('Middleware running')
     const { supabase, response } = createMiddlewareClient(request)
 
     // Refresh session if expired - required for Server Components
     // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware
-    await supabase.auth.getSession()
+    const session = await supabase.auth.getSession()
+    const updated = await updateSession(request)
+
+    console.log({ session, updated, response })
 
     return response
   } catch (e) {

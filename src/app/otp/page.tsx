@@ -10,17 +10,18 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const paramsSchema = z.object({
-  params: z.object({
-    companyId: z.string().transform((val) => parseInt(val)),
-  }),
-})
+// const paramsSchema = z.object({
+//   params: z.object({
+//     companySlug: z.string().transform((val) => parseInt(val)),
+//   }),
+// })
 
-type Params = z.infer<typeof paramsSchema>
+// type Params = z.infer<typeof paramsSchema>
 
 type FormValues = {
   otpCode: string
@@ -28,14 +29,17 @@ type FormValues = {
 
 const phoneNumberSchema = z.string()
 
-const Otp = (params: unknown) => {
-  const {
-    params: { companyId },
-  } = paramsSchema.parse(params)
+const companySlugSchema = z.string()
+
+const Otp = () => {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
   const searchParams = useSearchParams()
 
   const phoneNumber = phoneNumberSchema.parse(searchParams.get('phoneNumber'))
+
+  const companySlug = companySlugSchema.parse(searchParams.get('companySlug'))
 
   console.log({ phoneNumber })
 
@@ -43,8 +47,16 @@ const Otp = (params: unknown) => {
     const otpCode = values.otpCode
     // const chatToken = await createChatToken()
     // console.log({ chatToken })
-    const isVerified = await checkOTPVerified(phoneNumber, otpCode)
-    console.log({ isVerified })
+
+    startTransition(async () => {
+      const isVerified = await checkOTPVerified(phoneNumber, otpCode)
+
+      const queueUrl = Urls.queue(companySlug)
+
+      if (isVerified) {
+        router.push(queueUrl)
+      }
+    })
   }
 
   const { control, handleSubmit } = useForm<FormValues>()
@@ -83,7 +95,7 @@ const Otp = (params: unknown) => {
         Resend Code
       </button>
       <div className="my-1" />
-      <Link href={Urls.company(companyId)} className="self-end text-blue-400">
+      <Link href={Urls.company(companySlug)} className="self-end text-blue-400">
         Use a different phone number
       </Link>
       <div className="my-2" />

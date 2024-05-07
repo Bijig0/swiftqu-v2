@@ -10,7 +10,7 @@ import MainForm from '../../form'
 
 const paramsSchema = z.object({
   params: z.object({
-    companyId: z.string().transform((val) => parseInt(val)),
+    companySlug: z.string(),
   }),
 })
 
@@ -18,7 +18,7 @@ type Params = z.infer<typeof paramsSchema>
 
 export default async function Index(params: unknown) {
   const {
-    params: { companyId },
+    params: { companySlug },
   } = paramsSchema.parse(params)
   return (
     <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">
@@ -26,9 +26,9 @@ export default async function Index(params: unknown) {
       <img
         src="https://storage.fantuan.ca/fantuan/au/default/blob/ced89be74ba0463198110a755f4eb527/1678660559899275264."
         alt="Restaurant banner"
-        className="rounded-lg object-cover"
+        className="object-cover rounded-lg"
       />
-      <Card className="mx-auto w-full">
+      <Card className="w-full mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl">Queue Up</CardTitle>
           <CardDescription>
@@ -36,10 +36,10 @@ export default async function Index(params: unknown) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <MainForm companyId={companyId} />
+          <MainForm companySlug={companySlug} />
         </CardContent>
       </Card>
-      <p className="self-start justify-self-end text-sm text-gray-500">
+      <p className="self-start text-sm text-gray-500 justify-self-end">
         Powered by <span className="underline">SwiftQu</span> - Virtusl Queues
         Made Easy
       </p>

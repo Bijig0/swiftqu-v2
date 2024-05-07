@@ -1,19 +1,20 @@
 'use client'
+import sendOTP from '@/app/serverActions/sendOTP'
 import { Button } from '@/components/ui/button'
+import { ErrorMessage } from '@/components/ui/error-message'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import addQueryParamsToUrl from '@/utils/add-query-params-to-url'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useSocketId } from './queue-utils/useSocketId'
-import sendOTP from './serverActions/sendOTP'
 import Urls from './urls/urls'
 
 export type FormValues = {
@@ -23,44 +24,48 @@ export type FormValues = {
 }
 
 type Props = {
-  companyId: number
+  companySlug: string
+}
+
+const createPhoneNumberVerifyOTPUrl = (
+  companySlug: string,
+  phoneNumber: string,
+): string => {
+  const cleanPhoneNumber = (phoneNumber: string): string =>
+    phoneNumber.replace(/\D/g, '')
+
+  const cleanedPhoneNumber = cleanPhoneNumber(phoneNumber)
+
+  const baseUrl = Urls.otp
+
+  const url = addQueryParamsToUrl(baseUrl, {
+    phoneNumber: cleanedPhoneNumber,
+    companySlug,
+  })
+  
+  return url
 }
 
 const MainForm = (props: Props) => {
-  const { companyId } = props
+  const { companySlug } = props
   const form = useForm<FormValues>()
   const router = useRouter()
   const socketId = useSocketId()
 
-  // const pusher = initPusher()
-
-  // var channel = pusher.subscribe('my-channel')
-  // channel.bind('my-event', function (data) {
-  //   alert(JSON.stringify(data))
-  // })
-
   async function onSubmit(values: FormValues) {
+    const { email, phoneNumber } = values
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     // console.log({ socketId })
 
-    // await joinQueue(companyId, values.phoneNumber)
+    // await joinQueue(companySlug, values.phoneNumber)
 
-    const cleanPhoneNumber = (phoneNumber: string): string =>
-      phoneNumber.replace(/\D/g, '')
-
-    const phoneNumber = cleanPhoneNumber(values.phoneNumber)
-
-    const addQueryParam = (url: string, param: string, value: string) =>
-      `${url}?${param}=${value}`
-
-    const baseUrl = Urls.otp(companyId)
-
-    const url = addQueryParam(baseUrl, 'phoneNumber', phoneNumber)
+    const url = createPhoneNumberVerifyOTPUrl(companySlug, phoneNumber)
 
     sendOTP(phoneNumber)
 
     router.push(url)
+
     console.log(values)
   }
 
@@ -139,7 +144,7 @@ const MainForm = (props: Props) => {
                 <FormItem>
                   <FormLabel>
                     Email{' '}
-                    <span className="text-md text-gray-500">(optional)</span>
+                    <span className="text-gray-500 text-md">(optional)</span>
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -162,19 +167,6 @@ const MainForm = (props: Props) => {
         </div>
       </form>
     </Form>
-  )
-}
-
-type ErrorMessageProps = {
-  children: React.ReactNode
-}
-
-const ErrorMessage = (props: ErrorMessageProps) => {
-  const { children } = props
-  return (
-    <FormDescription className="text-sm text-red-500">
-      {children}
-    </FormDescription>
   )
 }
 

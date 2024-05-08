@@ -61,6 +61,8 @@ const Otp = () => {
 
   const { control, handleSubmit } = useForm<FormValues>()
 
+  const isSixDigits = (value: string) => value.length === 6
+
   return (
     <form
       onSubmit={handleSubmit(onVerifyOTP)}
@@ -75,7 +77,20 @@ const Otp = () => {
         control={control}
         defaultValue=""
         render={({ field: { onChange, value } }) => (
-          <InputOTP maxLength={6} onChange={onChange} value={value}>
+          <InputOTP
+            maxLength={6}
+            onChange={(newValue) => {
+              if (isSixDigits(newValue)) {
+                console.log('six digits')
+                handleSubmit(onVerifyOTP)()
+                return
+              }
+              console.log('not six digits')
+              console.log({ newValue })
+              onChange(newValue)
+            }}
+            value={value}
+          >
             <InputOTPGroup>
               <InputOTPSlot className="h-14 w-14" index={0} />
               <InputOTPSlot className="h-14 w-14" index={1} />

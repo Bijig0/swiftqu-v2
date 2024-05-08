@@ -1,28 +1,29 @@
 'use server'
 import { createServerClient } from '@/utils/supabase/supabase'
+import { AuthApiError } from '@supabase/supabase-js'
+import { Effect, pipe } from 'effect'
 import { cookies } from 'next/headers'
 
 type VerificationState = 'verified' | 'not verified'
 
-const verifyOTP = async (
+const verifyOTP = (
   phoneNumber: string,
   otpCode: string,
-): Promise<VerificationState> => {
-  const supabase = createServerClient(cookies())
-
-  console.log({ phoneNumber, otpCode })
-
-  const { data, error } = await supabase.auth.verifyOtp({
-    phone: phoneNumber,
-    token: otpCode,
-    type: 'sms',
-  })
-
-  console.log({ data, error })
-
-  if (error) throw error
-
-  return data !== null ? 'verified' : 'not verified'
+): Effect.Effect<VerificationState, Error | AuthApiError> => {
+  return pipe(
+    Effect.tryPromise(() => {
+      const supabase = createServerClient(cookies())
+      return supabase.auth.verifyOtp({
+        phone: phoneNumber,
+        token: otpCode,
+        type: 'sms',
+      })
+    }),
+    Effect.flatMap(({ data, error }) => {
+      if (error) return Effect.fail(error)
+      return Effect.succeed('verified' as const)
+    }),
+  )
 }
 
 const checkOTPVerified = async (

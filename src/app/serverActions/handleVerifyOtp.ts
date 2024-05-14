@@ -4,7 +4,7 @@ import { serverClient } from '../queue-utils/utils/getstream'
 import { createServerClient } from '@/utils/supabase/supabase'
 
 const createChatToken = async () => {
-  const supabase = createServerClient(cookies())
+  const supabase = createServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()

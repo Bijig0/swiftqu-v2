@@ -19,9 +19,7 @@ export async function GET(request: Request, params: unknown) {
       params: { queueId },
     } = paramsSchema.parse(params)
 
-    const cookiesStore = cookies()
-
-    const supabaseClient = createServerClient(cookiesStore)
+    const supabaseClient = createServerClient()
 
     const {
       data: { user },

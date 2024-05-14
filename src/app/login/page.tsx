@@ -13,8 +13,7 @@ export default function Login({
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
-    const cookieStore = cookies()
-    const supabase = createServerClient(cookieStore)
+    const supabase = createServerClient()
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -34,8 +33,7 @@ export default function Login({
     const origin = headers().get('origin')
     const email = formData.get('email') as string
     const password = formData.get('password') as string
-    const cookieStore = cookies()
-    const supabase = createServerClient(cookieStore)
+    const supabase = createServerClient()
 
     const { error } = await supabase.auth.signUp({
       email,

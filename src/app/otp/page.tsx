@@ -9,7 +9,8 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
-import { AuthError } from '@supabase/supabase-js'
+import { AuthApiError } from '@supabase/supabase-js'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -17,14 +18,6 @@ import { useState, useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import ErrorText from './ErrorText'
-
-// const paramsSchema = z.object({
-//   params: z.object({
-//     companySlug: z.string().transform((val) => parseInt(val)),
-//   }),
-// })
-
-// type Params = z.infer<typeof paramsSchema>
 
 type FormValues = {
   otpCode: string
@@ -34,7 +27,7 @@ const phoneNumberSchema = z.string()
 
 const companySlugSchema = z.string()
 
-const Otp = () => {
+const _Otp = () => {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -46,7 +39,12 @@ const Otp = () => {
 
   const [errorMessage, setErrorMessage] = useState<string>('')
 
-  const { control, handleSubmit, reset } = useForm<FormValues>()
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>()
 
   console.log({ phoneNumber })
 
@@ -68,8 +66,8 @@ const Otp = () => {
         }
         return
       } catch (error) {
-        if (error instanceof AuthError) {
-          console.log('AuthError')
+        if (error instanceof AuthApiError) {
+          console.log('AuthApiError')
           setErrorMessage('Code invalid or expired')
         } else if (error instanceof Error) {
           setErrorMessage('Oops, Something went wrong')
@@ -95,6 +93,13 @@ const Otp = () => {
         name="otpCode"
         control={control}
         defaultValue=""
+        rules={{
+          required: 'OTP code is required',
+          minLength: {
+            value: 6,
+            message: 'OTP Code must be 6 digits',
+          },
+        }}
         render={({ field: { onChange, value } }) => (
           <InputOTP
             maxLength={6}
@@ -125,6 +130,7 @@ const Otp = () => {
         )}
       />
       <div className="my-2" />
+      {errors.otpCode && <ErrorText>{errors.otpCode.message}</ErrorText>}
       {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
       <button onClick={resendOTP} className="self-end text-blue-400">
         Resend Code
@@ -148,6 +154,16 @@ const Otp = () => {
         )}
       </Button>
     </form>
+  )
+}
+
+const client = new QueryClient()
+
+const Otp = () => {
+  return (
+    <QueryClientProvider client={client}>
+      <_Otp />
+    </QueryClientProvider>
   )
 }
 

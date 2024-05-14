@@ -12,15 +12,16 @@ export const createBrowserClient = () =>
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   )
 
-export const createServerClient = (cookieStore: ReturnType<typeof cookies>) =>
-  serverClient(
+export const createServerClient = () => {
+  const cookieStore = cookies()
+  return serverClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       auth: {
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-        persistSession: false,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        persistSession: true,
       },
       cookies: {
         get(name: string) {
@@ -30,6 +31,7 @@ export const createServerClient = (cookieStore: ReturnType<typeof cookies>) =>
           try {
             cookieStore.set({ name, value, ...options })
           } catch (error) {
+            console.log({ error })
             // The `set` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
@@ -47,6 +49,7 @@ export const createServerClient = (cookieStore: ReturnType<typeof cookies>) =>
       },
     },
   )
+}
 
 export const createMiddlewareClient = (request: NextRequest) => {
   // Create an unmodified response

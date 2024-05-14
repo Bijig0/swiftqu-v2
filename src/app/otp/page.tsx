@@ -9,11 +9,14 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
+import { AuthError } from '@supabase/supabase-js'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import ErrorText from './ErrorText'
 
 // const paramsSchema = z.object({
 //   params: z.object({
@@ -41,6 +44,10 @@ const Otp = () => {
 
   const companySlug = companySlugSchema.parse(searchParams.get('companySlug'))
 
+  const [errorMessage, setErrorMessage] = useState<string>('')
+
+  const { control, handleSubmit, reset } = useForm<FormValues>()
+
   console.log({ phoneNumber })
 
   const onVerifyOTP = async (values: FormValues) => {
@@ -49,17 +56,29 @@ const Otp = () => {
     // console.log({ chatToken })
 
     startTransition(async () => {
-      const isVerified = await checkOTPVerified(phoneNumber, otpCode)
+      try {
+        const isVerified = await checkOTPVerified(phoneNumber, otpCode)
 
-      const queueUrl = Urls.queue(companySlug)
+        const queueUrl = Urls.queue(companySlug)
 
-      if (isVerified) {
-        router.push(queueUrl)
+        console.log({ queueUrl })
+
+        if (isVerified) {
+          router.push(queueUrl)
+        }
+        return
+      } catch (error) {
+        if (error instanceof AuthError) {
+          console.log('AuthError')
+          setErrorMessage('Code invalid or expired')
+        } else if (error instanceof Error) {
+          setErrorMessage('Oops, Something went wrong')
+        }
+        reset()
+        return
       }
     })
   }
-
-  const { control, handleSubmit } = useForm<FormValues>()
 
   const isSixDigits = (value: string) => value.length === 6
 
@@ -80,6 +99,7 @@ const Otp = () => {
           <InputOTP
             maxLength={6}
             onChange={(newValue) => {
+              onChange(newValue)
               if (isSixDigits(newValue)) {
                 console.log('six digits')
                 handleSubmit(onVerifyOTP)()
@@ -87,7 +107,6 @@ const Otp = () => {
               }
               console.log('not six digits')
               console.log({ newValue })
-              onChange(newValue)
             }}
             value={value}
           >
@@ -106,6 +125,7 @@ const Otp = () => {
         )}
       />
       <div className="my-2" />
+      {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
       <button onClick={resendOTP} className="self-end text-blue-400">
         Resend Code
       </button>
@@ -114,13 +134,10 @@ const Otp = () => {
         Use a different phone number
       </Link>
       <div className="my-2" />
-      <Button
-        type="submit"
-        className="text-md h-14 w-full rounded-xl"
-        size="lg"
-      >
-        Continue
-      </Button>
+      <Button>
+        <Loader2 className="h-4 w-4 animate-spin" />
+        {/* Please wait */}
+      </Button>{' '}
     </form>
   )
 }

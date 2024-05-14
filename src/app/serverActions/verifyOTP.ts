@@ -1,38 +1,49 @@
 'use server'
 import { createServerClient } from '@/utils/supabase/supabase'
-import { AuthApiError } from '@supabase/supabase-js'
+import * as Schema from '@effect/schema/Schema'
 import { Effect, pipe } from 'effect'
+import { UnknownException } from 'effect/Cause'
 import { cookies } from 'next/headers'
 
-type VerificationState = 'verified' | 'not verified'
+const verificationStates = ['verified', 'not verified'] as const
 
-const verifyOTP = (
-  phoneNumber: string,
-  otpCode: string,
-): Effect.Effect<VerificationState, Error | AuthApiError> => {
-  return pipe(
-    Effect.tryPromise(() => {
-      const supabase = createServerClient(cookies())
-      return supabase.auth.verifyOtp({
-        phone: phoneNumber,
-        token: otpCode,
-        type: 'sms',
-      })
-    }),
-    Effect.flatMap(({ data, error }) => {
-      if (error) return Effect.fail(error)
-      return Effect.succeed('verified' as const)
-    }),
+const verificationStatesSchema = Schema.Literal(...verificationStates)
+
+import { AuthError } from '@supabase/supabase-js'
+class MyAuthError extends Schema.TaggedError<AuthError>()('AuthError', {}) {}
+class MyUnknownException extends Schema.TaggedError<UnknownException>()(
+  'UnknownException',
+  {},
+) {}
+
+const exitSchema = Schema.Exit({
+  success: verificationStatesSchema,
+  failure: Schema.Union(MyAuthError, MyUnknownException),
+})
+
+const serialize = Schema.encodeSync(exitSchema)
+
+type VerificationState = (typeof verificationStates)[number]
+
+const checkOTPVerified = (phoneNumber: string, otpCode: string) => {
+  return Effect.runPromise(
+    pipe(
+      Effect.tryPromise(() => {
+        const supabase = createServerClient(cookies())
+        console.log({ otpCode })
+        return supabase.auth.verifyOtp({
+          phone: '61403057369',
+          token: otpCode,
+          type: 'sms',
+        })
+      }),
+      Effect.flatMap(({ data, error }) => {
+        console.log({ data, error })
+        if (error) return Effect.fail(error)
+        return Effect.succeed('verified' as const)
+      }),
+    ),
   )
-}
-
-const checkOTPVerified = async (
-  phoneNumber: string,
-  otpCode: string,
-): Promise<boolean> => {
-  const verifiedState = await verifyOTP(phoneNumber, otpCode)
-  const isVerified = verifiedState === 'verified'
-  return isVerified
 }
 
 export default checkOTPVerified

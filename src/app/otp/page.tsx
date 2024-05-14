@@ -134,10 +134,19 @@ const Otp = () => {
         Use a different phone number
       </Link>
       <div className="my-2" />
-      <Button>
-        <Loader2 className="h-4 w-4 animate-spin" />
-        {/* Please wait */}
-      </Button>{' '}
+      {/* <Button>
+      </Button>{' '} */}
+      <Button
+        type="submit"
+        className="text-md h-14 w-full rounded-xl"
+        size="lg"
+      >
+        {isPending ? (
+          <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+        ) : (
+          'Continue'
+        )}
+      </Button>
     </form>
   )
 }

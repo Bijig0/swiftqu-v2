@@ -36,7 +36,6 @@ const switchAuthTypeText = {
 export const phoneNumberVerificationSchema = z.object({
   name: z.string(),
   phoneNumber: z.string(),
-  email: z.undefined().nullable(), // This ensures email is not present
 })
 
 // Define the schema for the second variant
@@ -47,10 +46,7 @@ export const emailVerificationSchema = z.object({
 })
 
 // Combine the schemas into a discriminated union
-export const UserInfoFormValuesSchema = z.union([
-  phoneNumberVerificationSchema,
-  emailVerificationSchema,
-])
+export const UserInfoFormValuesSchema = phoneNumberVerificationSchema
 
 // Example usage
 export type UserInfoFormValues = z.infer<typeof UserInfoFormValuesSchema>
@@ -89,8 +85,6 @@ const MainForm = (props: Props) => {
       router.push(url)
 
       return
-    } else if (values.email) {
-      // handle email verification here
     }
 
     console.log(values)

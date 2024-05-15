@@ -1,9 +1,8 @@
 'use server'
 import { createServerClient } from '@/utils/supabase/supabase'
-import { cookies } from 'next/headers'
 
 const sendOTP = async (phoneNumber: string) => {
-  const supabase = createServerClient(cookies())
+  const supabase = createServerClient()
 
   console.log({ phoneNumber })
 

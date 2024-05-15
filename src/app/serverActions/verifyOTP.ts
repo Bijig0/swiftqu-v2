@@ -1,4 +1,5 @@
 'use server'
+import isDevMode from '@/utils/isDevMode'
 import { createServerClient } from '@/utils/supabase/supabase'
 import { Effect, pipe } from 'effect'
 
@@ -9,8 +10,8 @@ const checkOTPVerified = (phoneNumber: string, otpCode: string) => {
         const supabase = createServerClient()
         console.log({ otpCode })
         return supabase.auth.verifyOtp({
-          phone: phoneNumber,
-          token: otpCode,
+          phone: isDevMode ? '+61403057369' : phoneNumber,
+          token: isDevMode ? '123456' : otpCode,
           type: 'sms',
         })
       }),

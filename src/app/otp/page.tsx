@@ -9,7 +9,6 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
-import { AuthApiError } from '@supabase/supabase-js'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
@@ -17,6 +16,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { checkUserHasProfile } from '../queue-utils/checkUserHasProfile'
 import ErrorText from './ErrorText'
 import { createUserProfile } from './createUserProfile'
 
@@ -38,10 +38,12 @@ const _Otp = () => {
 
   const phoneNumberQueryParam = searchParams.get('phoneNumber')
   const nameQueryParam = searchParams.get('name')
+  const companySlugParam = searchParams.get('companySlug')
 
   const queryParams = {
     phoneNumber: phoneNumberQueryParam,
     name: nameQueryParam,
+    companySlug: companySlugParam,
   }
 
   const parsedQueryParams = otpSchema.parse(queryParams)
@@ -69,7 +71,13 @@ const _Otp = () => {
       try {
         await checkOTPVerified(phoneNumber, otpCode)
 
-        const userProfile = await createUserProfile(userInfo)
+        const userHasProfile = await checkUserHasProfile(userInfo)
+
+        console.log({ userHasProfile })
+
+        if (!userHasProfile) {
+          const userProfile = await createUserProfile(userInfo)
+        }
 
         const queueUrl = Urls.queue(companySlug)
 
@@ -79,12 +87,16 @@ const _Otp = () => {
 
         return
       } catch (error) {
-        if (error instanceof AuthApiError) {
+        if (error instanceof Error) {
+          const INVALID_OTP_CODE_MESSAGE = 'Token has expired or is invalid'
           console.log({ error })
-          setErrorMessage('Code invalid or expired')
-        } else if (error instanceof Error) {
-          console.log({ error })
-          setErrorMessage('Oops, Something went wrong')
+          if (error.message === INVALID_OTP_CODE_MESSAGE) {
+            const CORRECTED_INVALID_OTP_CODE_MESSAGE =
+              'Code is invalid or expired. Please try again'
+            setErrorMessage(CORRECTED_INVALID_OTP_CODE_MESSAGE)
+          } else {
+            setErrorMessage('Oops, Something went wrong')
+          }
         }
         reset()
         return

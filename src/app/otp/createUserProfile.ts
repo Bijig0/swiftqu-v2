@@ -9,9 +9,22 @@ export type UserInfo = UserInfoFormValues
 export const createUserProfile = async (userInfo: UserInfo) => {
   const supabase = createServerClient()
 
-  const transformedUserInfo = pipe(userInfo, objectToSnake, () => ({
-    is_otp_verified: true,
-  }))
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
+
+  if (userError || !user) throw userError
+
+  const transformedUserInfo = pipe(
+    userInfo,
+    objectToSnake,
+    (userInfo) => ({
+      ...userInfo,
+      is_otp_verified: true,
+    }),
+    (userInfo) => ({ ...userInfo, user_id: user.id }),
+  )
 
   // const toSnakeCase = objectToSnake(userInfo)
 
@@ -32,10 +45,10 @@ export const createUserProfile = async (userInfo: UserInfo) => {
   const { data: userProfile, error } = await supabase
     .from('user_profile')
     .insert(transformedUserInfo)
-    .select('first_name,last_name,chat_id,phone_number')
+    .select('name,chat_id,phone_number')
     .single()
 
-  console.log({ userProfile })
+  console.log({ userProfile, error })
 
   if (error) throw error
 

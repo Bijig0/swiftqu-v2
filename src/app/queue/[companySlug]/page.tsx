@@ -8,8 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Heading from '@/components/ui/heading'
 import { createServerClient } from '@/utils/supabase/supabase'
-import console from 'console'
-import { cookies } from 'next/headers'
 import { z } from 'zod'
 
 const paramsSchema = z.object({
@@ -26,13 +24,8 @@ export default async function Index(params: unknown) {
   } = paramsSchema.parse(params)
 
   const supabase = createServerClient()
-  const { data, error } = await supabase.auth.getUser()
 
-  console.log({ data, error })
-
-  if (error) throw error
-
-  console.log({ data })
+  const queueDetails = await getQueueDetails(queueUrl)
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">

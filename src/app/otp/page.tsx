@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/input-otp'
 import { AuthApiError } from '@supabase/supabase-js'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { pipe } from 'effect'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -18,12 +19,19 @@ import { useState, useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import ErrorText from './ErrorText'
+import { UserInfo, createUserProfile } from './createUserProfile'
 
 type FormValues = {
   otpCode: string
 }
 
 const phoneNumberSchema = z.string()
+
+const emailSchema = z.string().email()
+
+const nameSchema = z.string()
+
+const stringSchema = z.string()
 
 const companySlugSchema = z.string()
 
@@ -33,9 +41,27 @@ const _Otp = () => {
 
   const searchParams = useSearchParams()
 
-  const phoneNumber = phoneNumberSchema.parse(searchParams.get('phoneNumber'))
+  const phoneNumber = pipe(
+    searchParams.get('phoneNumber'),
+    stringSchema.parse,
+    decodeURI,
+    phoneNumberSchema.parse,
+  )
 
-  const companySlug = companySlugSchema.parse(searchParams.get('companySlug'))
+  const email = pipe(
+    searchParams.get('email'),
+    stringSchema.parse,
+    decodeURI,
+    emailSchema.parse,
+  )
+
+  const name = pipe(searchParams.get('name'), stringSchema.parse, decodeURI)
+
+  const companySlug = pipe(
+    searchParams.get('companySlug'),
+    stringSchema.parse,
+    decodeURI,
+  )
 
   const [errorMessage, setErrorMessage] = useState<string>('')
 
@@ -54,16 +80,18 @@ const _Otp = () => {
     // console.log({ chatToken })
 
     startTransition(async () => {
+      const userInfo = { phoneNumber, email, name } satisfies UserInfo
       try {
-        const isVerified = await checkOTPVerified(phoneNumber, otpCode)
+        await checkOTPVerified(phoneNumber, otpCode)
+
+        await createUserProfile(userInfo)
 
         const queueUrl = Urls.queue(companySlug)
 
         console.log({ queueUrl })
 
-        if (isVerified) {
-          router.push(queueUrl)
-        }
+        router.push(queueUrl)
+
         return
       } catch (error) {
         if (error instanceof AuthApiError) {
@@ -144,11 +172,11 @@ const _Otp = () => {
       </Button>{' '} */}
       <Button
         type="submit"
-        className="text-md h-14 w-full rounded-xl"
+        className="w-full text-md h-14 rounded-xl"
         size="lg"
       >
         {isPending ? (
-          <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+          <Loader2 className="w-8 h-8 mx-auto animate-spin" />
         ) : (
           'Continue'
         )}

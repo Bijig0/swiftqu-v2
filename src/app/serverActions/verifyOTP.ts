@@ -17,7 +17,7 @@ const checkOTPVerified = (phoneNumber: string, otpCode: string) => {
       Effect.flatMap(({ data, error }) => {
         console.log({ data, error })
         if (error) return Effect.fail(error)
-        return Effect.succeed('verified' as const)
+        return Effect.succeed(data)
       }),
     ),
   )

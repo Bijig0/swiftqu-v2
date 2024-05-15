@@ -4,10 +4,13 @@ import { UserInfoFormValues } from '../form'
 
 export type UserInfo = UserInfoFormValues
 
-export const checkUserHasProfile = async (userInfo: UserInfo) => {
+export const checkUserHasProfile = async (
+  userInfo: UserInfo,
+): Promise<boolean> => {
+  console.log({ userInfo })
   const supabase = createServerClient()
 
-  const { data: userProfile, error } = await supabase
+  const { count, error } = await supabase
     .from('user_profile')
     .select('user_profile_id,chat_id,phone_number', {
       count: 'exact',
@@ -15,7 +18,11 @@ export const checkUserHasProfile = async (userInfo: UserInfo) => {
     })
     .eq('phone_number', userInfo.phoneNumber)
 
-  if (error) throw error
+  console.log({ count })
 
-  return userProfile
+  if (error || !count) throw error
+
+  if (count > 1) throw new Error('User has multiple profiles')
+
+  return count === 1
 }

@@ -27,7 +27,7 @@ type FormValues = {
 const otpSchema = z.object({
   phoneNumber: z.string(),
   name: z.string(),
-  companySlug: z.string(),
+  companyId: z.string().transform((val) => parseInt(val)),
 })
 
 const _Otp = () => {
@@ -38,17 +38,17 @@ const _Otp = () => {
 
   const phoneNumberQueryParam = searchParams.get('phoneNumber')
   const nameQueryParam = searchParams.get('name')
-  const companySlugParam = searchParams.get('companySlug')
+  const companyIdParam = searchParams.get('companyId')
 
   const queryParams = {
     phoneNumber: phoneNumberQueryParam,
     name: nameQueryParam,
-    companySlug: companySlugParam,
+    companyId: companyIdParam,
   }
 
   const parsedQueryParams = otpSchema.parse(queryParams)
 
-  const { companySlug, ...userInfo } = parsedQueryParams
+  const { companyId, ...userInfo } = parsedQueryParams
 
   const [errorMessage, setErrorMessage] = useState<string>('')
 
@@ -79,7 +79,7 @@ const _Otp = () => {
           const userProfile = await createUserProfile(userInfo)
         }
 
-        const queueUrl = Urls.queue(companySlug)
+        const queueUrl = Urls.queue(companyId)
 
         console.log({ queueUrl })
 
@@ -162,7 +162,7 @@ const _Otp = () => {
         Resend Code
       </button>
       <div className="my-1" />
-      <Link href={Urls.company(companySlug)} className="self-end text-blue-400">
+      <Link href={Urls.company(companyId)} className="self-end text-blue-400">
         Use a different phone number
       </Link>
       <div className="my-2" />

@@ -1,8 +1,8 @@
 const Urls = {
   home: '/',
-  queue: (companySlug: string) => `/queue/${companySlug}`,
+  queue: (companyId: number) => `/queue/${companyId}`,
   otp: `/otp`,
-  company: (companySlug: string) => `/company/${companySlug}`,
+  company: (companyId: number) => `/company/${companyId}`,
   emailVerifyOTP: `/verifyEmail`,
 }
 

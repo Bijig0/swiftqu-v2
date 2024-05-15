@@ -52,11 +52,11 @@ export const UserInfoFormValuesSchema = phoneNumberVerificationSchema
 export type UserInfoFormValues = z.infer<typeof UserInfoFormValuesSchema>
 
 type Props = {
-  companySlug: string
+  companyId: number
 }
 
 const MainForm = (props: Props) => {
-  const { companySlug } = props
+  const { companyId } = props
   const form = useForm<UserInfoFormValues>()
   const router = useRouter()
   const socketId = useSocketId()
@@ -68,7 +68,7 @@ const MainForm = (props: Props) => {
     // ✅ This will be type-safe and validated.
     // console.log({ socketId })
 
-    // await joinQueue(companySlug, values.phoneNumber)
+    // await joinQueue(companyId, values.phoneNumber)
 
     if (values.phoneNumber) {
       const { phoneNumber } = values
@@ -77,7 +77,7 @@ const MainForm = (props: Props) => {
       const url = addQueryParamsToUrl(baseUrl, {
         phoneNumber: encodeURI(phoneNumber),
         name: encodeURI(name),
-        companySlug: encodeURI(companySlug),
+        companyId: companyId.toString(),
       })
 
       sendOTP(phoneNumber)

@@ -1,37 +1,37 @@
 'use server'
 import { createServerClient } from '@/utils/supabase/supabase'
+import { pipe } from 'effect'
 import { objectToSnake } from 'ts-case-convert'
-import { createCompliantGetStreamChatId } from '../queue-utils/utils/createChatId'
-import { serverClient } from '../queue-utils/utils/getstream'
+import { UserInfoFormValues } from '../form'
 
-export type UserInfo = {
-  phoneNumber: string
-  email: string
-  name: string
-}
+export type UserInfo = UserInfoFormValues
 
 export const createUserProfile = async (userInfo: UserInfo) => {
   const supabase = createServerClient()
 
-  const toSnakeCase = objectToSnake(userInfo)
+  const transformedUserInfo = pipe(userInfo, objectToSnake, () => ({
+    is_otp_verified: true,
+  }))
 
-  const chatId = createCompliantGetStreamChatId(userInfo)
+  // const toSnakeCase = objectToSnake(userInfo)
 
-  console.log('Upserting Get Stream User')
+  // const chatId = createCompliantGetStreamChatId(userInfo)
 
-  serverClient.upsertUser({ id: chatId, name: chatId, role: 'user' })
+  // console.log('Upserting Get Stream User')
 
-  console.log('Upserted Get Stream User')
+  // serverClient.upsertUser({ id: chatId, name: chatId, role: 'user' })
 
-  const withChatId = { ...toSnakeCase, chat_id: chatId }
+  // console.log('Upserted Get Stream User')
 
-  const withOTPVerified = { ...withChatId, is_otp_verified: true }
+  // const withChatId = { ...toSnakeCase, chat_id: chatId }
+
+  // const withOTPVerified = { ...withChatId, is_otp_verified: true }
 
   // const createWithoutPhoneNumber = <T extends typeof withChatId>({ phone_number, ...rest }: T) => rest;
 
   const { data: userProfile, error } = await supabase
     .from('user_profile')
-    .insert(withOTPVerified)
+    .insert(transformedUserInfo)
     .select('first_name,last_name,chat_id,phone_number')
     .single()
 
@@ -39,5 +39,5 @@ export const createUserProfile = async (userInfo: UserInfo) => {
 
   if (error) throw error
 
-  response.status(200).json(userProfile)
+  return userProfile
 }

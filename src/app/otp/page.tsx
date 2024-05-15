@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/input-otp'
 import { AuthApiError } from '@supabase/supabase-js'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { pipe } from 'effect'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -19,21 +18,17 @@ import { useState, useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import ErrorText from './ErrorText'
-import { UserInfo, createUserProfile } from './createUserProfile'
+import { createUserProfile } from './createUserProfile'
 
 type FormValues = {
   otpCode: string
 }
 
-const phoneNumberSchema = z.string()
-
-const emailSchema = z.string().email()
-
-const nameSchema = z.string()
-
-const stringSchema = z.string()
-
-const companySlugSchema = z.string()
+const otpSchema = z.object({
+  phoneNumber: z.string(),
+  name: z.string(),
+  companySlug: z.string(),
+})
 
 const _Otp = () => {
   const router = useRouter()
@@ -41,27 +36,17 @@ const _Otp = () => {
 
   const searchParams = useSearchParams()
 
-  const phoneNumber = pipe(
-    searchParams.get('phoneNumber'),
-    stringSchema.parse,
-    decodeURI,
-    phoneNumberSchema.parse,
-  )
+  const phoneNumberQueryParam = searchParams.get('phoneNumber')
+  const nameQueryParam = searchParams.get('name')
 
-  const email = pipe(
-    searchParams.get('email'),
-    stringSchema.parse,
-    decodeURI,
-    emailSchema.parse,
-  )
+  const queryParams = {
+    phoneNumber: phoneNumberQueryParam,
+    name: nameQueryParam,
+  }
 
-  const name = pipe(searchParams.get('name'), stringSchema.parse, decodeURI)
+  const parsedQueryParams = otpSchema.parse(queryParams)
 
-  const companySlug = pipe(
-    searchParams.get('companySlug'),
-    stringSchema.parse,
-    decodeURI,
-  )
+  const { companySlug, ...userInfo } = parsedQueryParams
 
   const [errorMessage, setErrorMessage] = useState<string>('')
 
@@ -72,7 +57,7 @@ const _Otp = () => {
     formState: { errors },
   } = useForm<FormValues>()
 
-  console.log({ phoneNumber })
+  // console.log({ phoneNumber })
 
   const onVerifyOTP = async (values: FormValues) => {
     const otpCode = values.otpCode
@@ -80,11 +65,11 @@ const _Otp = () => {
     // console.log({ chatToken })
 
     startTransition(async () => {
-      const userInfo = { phoneNumber, email, name } satisfies UserInfo
+      const { phoneNumber, name } = userInfo
       try {
         await checkOTPVerified(phoneNumber, otpCode)
 
-        await createUserProfile(userInfo)
+        const userProfile = await createUserProfile(userInfo)
 
         const queueUrl = Urls.queue(companySlug)
 
@@ -95,9 +80,10 @@ const _Otp = () => {
         return
       } catch (error) {
         if (error instanceof AuthApiError) {
-          console.log('AuthApiError')
+          console.log({ error })
           setErrorMessage('Code invalid or expired')
         } else if (error instanceof Error) {
+          console.log({ error })
           setErrorMessage('Oops, Something went wrong')
         }
         reset()

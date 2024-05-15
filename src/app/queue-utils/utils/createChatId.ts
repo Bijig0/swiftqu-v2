@@ -1,7 +1,9 @@
 import { confirm, input } from '@inquirer/prompts'
 import { UserSchema } from './schemas'
 
-export function createCompliantGetStreamChatId(user: UserSchema): string {
+import { UserInfo } from '../../otp/createUserProfile'
+
+export function createCompliantGetStreamChatId(user: UserInfo): string {
   const userId = user.phoneNumber.concat(user.firstName)
 
   const compliantChars = 'abcdefghijklmnopqrstuvwxyz0123456789@e'

@@ -33,27 +33,27 @@ const switchAuthTypeText = {
   email: 'Verify with phone number',
 } satisfies Record<AuthType, string>
 
-const phoneNumberVerificationSchema = z.object({
+export const phoneNumberVerificationSchema = z.object({
   name: z.string(),
   phoneNumber: z.string(),
-  email: z.undefined(), // This ensures email is not present
+  email: z.undefined().nullable(), // This ensures email is not present
 })
 
 // Define the schema for the second variant
-const emailVerificationSchema = z.object({
+export const emailVerificationSchema = z.object({
   name: z.string(),
-  phoneNumber: z.undefined(), // This ensures phoneNumber is not present
-  email: z.string(),
+  phoneNumber: z.undefined().nullable(), // This ensures phoneNumber is not present
+  email: z.string().email(),
 })
 
 // Combine the schemas into a discriminated union
-export const FormValuesSchema = z.union([
+export const UserInfoFormValuesSchema = z.union([
   phoneNumberVerificationSchema,
   emailVerificationSchema,
 ])
 
 // Example usage
-export type FormValues = z.infer<typeof FormValuesSchema>
+export type UserInfoFormValues = z.infer<typeof UserInfoFormValuesSchema>
 
 type Props = {
   companySlug: string
@@ -61,12 +61,12 @@ type Props = {
 
 const MainForm = (props: Props) => {
   const { companySlug } = props
-  const form = useForm<FormValues>()
+  const form = useForm<UserInfoFormValues>()
   const router = useRouter()
   const socketId = useSocketId()
   const [authType, setAuthType] = useState<AuthType>('phoneNumber')
 
-  async function onSubmit(values: FormValues) {
+  async function onSubmit(values: UserInfoFormValues) {
     const { name } = values
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
@@ -133,13 +133,17 @@ const MainForm = (props: Props) => {
               <FormField
                 control={form.control}
                 name="phoneNumber"
-                rules={{
-                  required: 'Phone number is required',
-                  validate: (val) =>
-                    isValidPhoneNumber(val!, 'AU')
-                      ? true
-                      : 'This field must be a valid AU phone number',
-                }}
+                rules={
+                  authType === 'phoneNumber'
+                    ? {
+                        required: 'Phone number is required',
+                        validate: (val) =>
+                          isValidPhoneNumber(val!, 'AU')
+                            ? true
+                            : 'This field must be a valid AU phone number',
+                      }
+                    : {}
+                }
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
@@ -159,48 +163,6 @@ const MainForm = (props: Props) => {
               />
             </div>
           )}
-          {authType === 'email' && (
-            <div className="grid gap-2">
-              <FormField
-                control={form.control}
-                name="email"
-                rules={{
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'invalid email address',
-                  },
-                }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Email{' '}
-                      <span className="text-gray-500 text-md">(optional)</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="john@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    {errors.email && (
-                      <ErrorMessage>{errors.email.message}</ErrorMessage>
-                    )}
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          <button
-            onClick={() =>
-              setAuthType((prevAuthType) => oppositeAuthType[prevAuthType])
-            }
-            className="self-end text-blue-400"
-          >
-            {switchAuthTypeText[authType]}
-          </button>
 
           <Button type="submit" className="w-full">
             Queue Up

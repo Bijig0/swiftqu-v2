@@ -19,6 +19,7 @@ import { z } from 'zod'
 import { checkUserHasProfile } from '../queue-utils/checkUserHasProfile'
 import ErrorText from './ErrorText'
 import { createUserProfile } from './createUserProfile'
+import joinQueue from '../serverActions/joinQueue'
 
 type FormValues = {
   otpCode: string
@@ -70,6 +71,8 @@ const _Otp = () => {
       const { phoneNumber, name } = userInfo
       try {
         await checkOTPVerified(phoneNumber, otpCode)
+
+        await joinQueue(companyId, phoneNumber)
 
         const userHasProfile = await checkUserHasProfile(userInfo)
 

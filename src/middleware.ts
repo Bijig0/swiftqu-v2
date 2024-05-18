@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   try {
     // This `try/catch` block is only here for the interactive tutorial.
     // Feel free to remove once you have Supabase connected.
-    console.log('Middleware running')
+    // console.log('Middleware running')
     const { supabase, response } = createMiddlewareClient(request)
 
     // Refresh session if expired - required for Server Components
@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
     const session = await supabase.auth.getSession()
     const updated = await updateSession(request)
 
-    console.log({ session, updated, response })
+    // console.log({ session, updated, response })
 
     return response
   } catch (e) {

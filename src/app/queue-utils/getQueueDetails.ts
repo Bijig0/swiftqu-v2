@@ -1,14 +1,16 @@
 import { createServerClient } from '@/utils/supabase/supabase'
+import { redirect } from 'next/navigation'
 import { Tables } from '../types/supabase'
+import Urls from '../urls/urls'
 
-const getQueueDetails = async (queueId: number) => {
+const getQueueDetails = async (companyId: number) => {
   const supabase = createServerClient()
   try {
     const {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user) throw new Error('No user found')
+    if (!user) redirect(Urls.company(companyId))
 
     const { data: userProfile, error: userProfileError } = await supabase
       .from('user_profile')
@@ -21,7 +23,7 @@ const getQueueDetails = async (queueId: number) => {
     const { data: queueDetails, error } = await supabase
       .from('queuedetails')
       .select()
-      .eq('queue_id', queueId)
+      .eq('queue_id', companyId)
       .eq('user_profile_id', userProfile.user_profile_id)
       .single()
 
@@ -29,11 +31,14 @@ const getQueueDetails = async (queueId: number) => {
 
     if (error) throw error
 
-    const getQueuePosition = async (userProfileId: number, queueId: number) => {
+    const getQueuePosition = async (
+      userProfileId: number,
+      companyId: number,
+    ) => {
       const { data: sortedUsersInQueue, error: queueError } = await supabase
         .from('queuedetails')
         .select()
-        .eq('queue_id', queueId)
+        .eq('queue_id', companyId)
         .order('joined_at')
 
       if (!sortedUsersInQueue || queueError) throw queueError
@@ -56,7 +61,7 @@ const getQueueDetails = async (queueId: number) => {
 
     const position = await getQueuePosition(
       userProfile.user_profile_id,
-      queueId,
+      companyId,
     )
 
     const addQueuePosition = (
@@ -68,12 +73,9 @@ const getQueueDetails = async (queueId: number) => {
 
     const withQueuePosition = addQueuePosition(queueDetails, position)
 
-    response.status(200).json(withQueuePosition)
-
-    return
+    return withQueuePosition
   } catch (error) {
-    response.status(400).json(error)
-    return
+    throw error
   }
 }
 

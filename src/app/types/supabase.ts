@@ -159,8 +159,7 @@ export type Database = {
           company_id: number
         }
         Returns: {
-          first_name: string
-          last_name: string
+          name: string
           phone_number: string
           joined_at: string
           position: number

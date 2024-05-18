@@ -1,3 +1,4 @@
+import getRestaurantData from '@/app/company/[companyId]/getRestaurantData'
 import getQueueDetails from '@/app/queue-utils/getQueueDetails'
 import {
   Accordion,
@@ -8,12 +9,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Heading from '@/components/ui/heading'
-import { createServerClient } from '@/utils/supabase/supabase'
 import { z } from 'zod'
+import LeaveQueueButton from './LeaveQueueButton'
 
 const paramsSchema = z.object({
   params: z.object({
-    companyId: z.string(),
+    companyId: z.string().transform((val) => parseInt(val, 10)),
   }),
 })
 
@@ -24,35 +25,37 @@ export default async function Index(params: unknown) {
     params: { companyId },
   } = paramsSchema.parse(params)
 
-  const supabase = createServerClient()
+  const restaurantData = await getRestaurantData(companyId)
 
   const queueDetails = await getQueueDetails(companyId)
 
+  const { position } = queueDetails
+
+  const { name, image_url } = restaurantData
+
   return (
     <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">
-      <Heading>{companyId} Waiting Room</Heading>
+      <Heading>{name} Waiting Room</Heading>
       <img
-        src="https://storage.fantuan.ca/fantuan/au/default/blob/ced89be74ba0463198110a755f4eb527/1678660559899275264."
+        src={image_url ?? ''}
         alt="Restaurant banner"
-        className="rounded-lg object-cover"
+        className="object-cover rounded-lg"
       />
-      <Card className="mx-auto flex w-full items-center justify-center">
+      <Card className="flex items-center justify-center w-full mx-auto">
         <CardContent className="flex items-center justify-center py-16">
-          <h1 className="font-primary-medium text-center text-5xl font-bold sm:text-6xl">
-            3rd{' '}
+          <h1 className="text-5xl font-bold text-center font-primary-medium sm:text-6xl">
+            {position}{' '}
             <span className="block text-lg font-light text-gray-500">
               in queue
             </span>
           </h1>
         </CardContent>
       </Card>
-      <div className="flex w-full justify-evenly gap-4">
+      <div className="flex w-full gap-4 justify-evenly">
         <Button size={'lg'} className="flex-1 bg-blue-600">
           Chat With Us
         </Button>
-        <Button size="lg" className="flex-1 bg-red-700 hover:bg-red-800 ">
-          Leave Queue
-        </Button>
+        <LeaveQueueButton />
       </div>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem className="no-underline" value="item-1">
@@ -70,7 +73,7 @@ export default async function Index(params: unknown) {
         </AccordionItem>
       </Accordion>
 
-      <p className="self-start justify-self-end text-sm text-gray-500">
+      <p className="self-start text-sm text-gray-500 justify-self-end">
         Powered by <span className="underline">SwiftQu</span> - Virtusl Queues
         Made Easy
       </p>

@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/card'
 import { z } from 'zod'
 import MainForm from '../../form'
+import getRestaurantData from './getRestaurantData'
 
 const paramsSchema = z.object({
   params: z.object({
@@ -20,15 +21,20 @@ export default async function Index(params: unknown) {
   const {
     params: { companyId },
   } = paramsSchema.parse(params)
+
+  const restaurantData = await getRestaurantData(companyId)
+
+  const { name, image_url } = restaurantData
+
   return (
     <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 sm:max-w-md">
-      <h1 className="self-start text-3xl font-extrabold">HaiDiLao Queue</h1>
+      <h1 className="self-start text-3xl font-extrabold">{name} Queue</h1>
       <img
-        src="https://storage.fantuan.ca/fantuan/au/default/blob/ced89be74ba0463198110a755f4eb527/1678660559899275264."
+        src={image_url ?? ''}
         alt="Restaurant banner"
-        className="object-cover rounded-lg"
+        className="rounded-lg object-cover"
       />
-      <Card className="w-full mx-auto">
+      <Card className="mx-auto w-full">
         <CardHeader>
           <CardTitle className="text-2xl">Queue Up</CardTitle>
           <CardDescription>
@@ -39,7 +45,7 @@ export default async function Index(params: unknown) {
           <MainForm companyId={companyId} />
         </CardContent>
       </Card>
-      <p className="self-start text-sm text-gray-500 justify-self-end">
+      <p className="self-start justify-self-end text-sm text-gray-500">
         Powered by <span className="underline">SwiftQu</span> - Virtusl Queues
         Made Easy
       </p>

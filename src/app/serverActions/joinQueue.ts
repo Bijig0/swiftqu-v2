@@ -1,6 +1,5 @@
 'use server'
 import { createServerClient } from '@/utils/supabase/supabase'
-import { cookies } from 'next/headers'
 import {
   addUserToQueue,
   alertRestaurantOfSuccessfulJoin,
@@ -23,9 +22,7 @@ const joinQueue = async (companyId: number, socketId: string) => {
     },
   } satisfies QueueActionSchema
 
-  const cookiesStore = cookies()
-
-  const supabaseClient = createServerClient(cookiesStore)
+  const supabaseClient = createServerClient()
 
   const {
     data: { user },
@@ -54,36 +51,36 @@ const joinQueue = async (companyId: number, socketId: string) => {
     return userIsPresentInQueue
   }
 
-  const enterUserIntoChatChannel = async () => {
-    const userChatId = await getUserChatId(supabaseClient, user)
+  // const enterUserIntoChatChannel = async () => {
+  //   const userChatId = await getUserChatId(supabaseClient, user)
 
-    assertNotUndefined(userChatId)
+  //   assertNotUndefined(userChatId)
 
-    const chatChannelName = retrieveChatChannelName(userChatId, companyId)
-    const admin = await getRestaurantAdmin(supabaseClient, companyId)
-    const adminChatId = admin.chat_id
-    assertNotUndefined(adminChatId)
+  //   const chatChannelName = retrieveChatChannelName(userChatId, companyId)
+  //   const admin = await getRestaurantAdmin(supabaseClient, companyId)
+  //   const adminChatId = admin.chat_id
+  //   assertNotUndefined(adminChatId)
 
-    console.log(`Initializing chat channel ${chatChannelName}`)
-    const channel = serverClient.channel('messaging', chatChannelName, {
-      created_by_id: adminChatId,
-    })
-    console.log(`Initialized chat channel ${chatChannelName}`)
+  //   console.log(`Initializing chat channel ${chatChannelName}`)
+  //   const channel = serverClient.channel('messaging', chatChannelName, {
+  //     created_by_id: adminChatId,
+  //   })
+  //   console.log(`Initialized chat channel ${chatChannelName}`)
 
-    console.log(`Creating chat channel ${chatChannelName}`)
-    await channel.create()
-    await channel.update({ disabled: false })
-    console.log(`Created chat channel ${chatChannelName}`)
+  //   console.log(`Creating chat channel ${chatChannelName}`)
+  //   await channel.create()
+  //   await channel.update({ disabled: false })
+  //   console.log(`Created chat channel ${chatChannelName}`)
 
-    if (userProfile.chat_id === null || admin.chat_id === null)
-      throw new Error('Chat id null')
+  //   if (userProfile.chat_id === null || admin.chat_id === null)
+  //     throw new Error('Chat id null')
 
-    await channel.addMembers([userProfile.chat_id, admin.chat_id])
-    await channel.sendMessage({
-      text: `Welcome! Feel free to send us a message if you have any enquiries, happy queuing :)`,
-      user_id: adminChatId,
-    })
-  }
+  //   await channel.addMembers([userProfile.chat_id, admin.chat_id])
+  //   await channel.sendMessage({
+  //     text: `Welcome! Feel free to send us a message if you have any enquiries, happy queuing :)`,
+  //     user_id: adminChatId,
+  //   })
+  // }
 
   const alertUserOfSuccessfulJoin = async () => {
     const joinQueueResponse = {
@@ -105,7 +102,7 @@ const joinQueue = async (companyId: number, socketId: string) => {
   }
 
   await addUserToQueue(supabaseClient, companyId, userProfile)
-  await enterUserIntoChatChannel()
+  // await enterUserIntoChatChannel()
 
   await alertUserOfSuccessfulJoin()
   await alertRestaurantOfSuccessfulJoin(companyId)

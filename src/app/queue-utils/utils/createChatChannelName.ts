@@ -22,7 +22,7 @@ function retrieveChatChannelName(
   return `user-${cleanedUserIdentifier}-company_id-${companyId}-at-`
 }
 
-if (require.main === module) {
+if (require.main !== undefined && require.main === module) {
   ;(async () => {
     const userChatId = await input({ message: "Enter the user's chat id" })
     const companyId = await input({ message: 'Enter the company id' })

@@ -13,14 +13,17 @@ import getOrCreateUserChannelName from '@/app/queue-utils/utils/getOrCreateUserC
 import { serverClient } from '@/utils/getstream'
 import { objectToCamel, objectToSnake } from 'ts-case-convert'
 import { z } from 'zod'
-import { createAuthorizedAdminSupabaseClient } from '../supabase'
+import {
+  createAdminSupabaseClient,
+  createAuthorizedAdminSupabaseClient,
+} from '../supabase'
 import { corsHeaders } from '../utils/cors'
 
 export { OPTIONS } from '../utils/cors'
 
 const userToInteractWithSchema = z.object({
   name: z.string(),
-  phoneNumber: z.string(),
+  phoneNumber: z.string().optional(),
 })
 
 const adminQueueActionSchema = z.object({
@@ -48,6 +51,7 @@ export async function POST(request: Request, params: unknown) {
     if (!authKey) throw new Error('No auth header')
 
     const supabaseClient = createAuthorizedAdminSupabaseClient(authKey)
+    const adminSupabaseClient = createAdminSupabaseClient()
 
     const body = await request.json()
 
@@ -74,6 +78,11 @@ export async function POST(request: Request, params: unknown) {
         .select('user_id')
         .eq('phone_number', uncheckedUserToInteractWith.phoneNumber)
 
+      console.log({
+        maybeAlreadyCreatedUnverifiedUser,
+        maybeAlreadyCreatedUnverifiedUserError,
+      })
+
       if (maybeAlreadyCreatedUnverifiedUserError)
         throw maybeAlreadyCreatedUnverifiedUserError
 
@@ -83,9 +92,11 @@ export async function POST(request: Request, params: unknown) {
         const {
           data: { user },
           error,
-        } = await supabaseClient.auth.admin.createUser({
+        } = await adminSupabaseClient.auth.admin.createUser({
           phone: uncheckedUserToInteractWith.phoneNumber,
         })
+
+        console.log({ user, error })
 
         if (!user || error) throw error
 
@@ -168,9 +179,13 @@ export async function POST(request: Request, params: unknown) {
 
     const userExists = await checkUserToInteractWithExists()
 
+    console.log({ userExists })
+
     const userToInteractWith = userExists
       ? await retrieveUser()
       : await createUnverifiedUser()
+
+    console.log({ userToInteractWith })
 
     userToInteractWith satisfies UserToInteractWith
 
@@ -191,8 +206,7 @@ export async function POST(request: Request, params: unknown) {
         }
 
         await alertRestaurantOfFailedJoin()
-        res.status(404).json({ result: `ok` })
-        return
+        return Response.json({ result: `ok` }, { headers: corsHeaders })
       }
 
       const toSnakeCase = objectToSnake(userToInteractWith)
@@ -201,9 +215,7 @@ export async function POST(request: Request, params: unknown) {
 
       await alertRestaurantOfSuccessfulJoin(companyId)
 
-      res.status(200).json({ result: `ok` })
-
-      return
+      return Response.json({ result: `ok` }, { headers: corsHeaders })
     }
 
     if (actionType === 'leave-queue') {
@@ -283,8 +295,7 @@ export async function POST(request: Request, params: unknown) {
       await alertOtherUsersOfSuccessfulLeave()
       await alertRestaurantOfSuccessfulLeave()
 
-      res.status(200).json({ result: `ok` })
-      return
+      return Response.json({ result: `ok` }, { headers: corsHeaders })
     }
 
     if (actionType === 'seat-user') {

@@ -17,3 +17,8 @@ export const createAuthorizedAdminSupabaseClient = (authKey: string) => {
   return client
 }
 
+export const createAdminSupabaseClient = () => {
+  const client = createClient<Database>(SUPABASE_URL, SERVICE_KEY)
+
+  return client
+}

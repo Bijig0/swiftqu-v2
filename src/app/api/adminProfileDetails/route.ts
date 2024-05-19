@@ -1,5 +1,6 @@
 import { assertNotUndefined } from '@/app/queue-utils/utils/assertNotUndefined'
 import { serverClient } from '@/utils/getstream'
+import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { createAuthorizedAdminSupabaseClient } from '../supabase'
 import { corsHeaders } from '../utils/cors'
@@ -14,7 +15,7 @@ const adminSignInResponseSchema = z.object({
 
 type AdminSignInResponse = z.infer<typeof adminSignInResponseSchema>
 
-export async function GET(request: Request, params: unknown) {
+export async function GET(request: NextRequest, context?: any) {
   try {
     const authKey = request.headers.get('authorization')
 

@@ -3,7 +3,6 @@ import { TriggerParams } from 'pusher'
 import { initPusher } from '../api/utils/pusher'
 import { Database, Tables } from '../types/supabase'
 import { QueueEventResponse } from './types'
-import createChatChannelName from './utils/createChatChannelName'
 import getOrCreateAdminChannelName from './utils/getOrCreateAdminChannelName'
 
 const pusher = initPusher()
@@ -49,21 +48,15 @@ export const triggerQueueEvent = async (
 export const addUserToQueue = async (
   supabaseClient: AppSupabaseClient,
   companyId: number,
-  userProfile: Pick<
-    Tables<'user_profile'>,
-    'user_profile_id' | 'chat_id' | 'phone_number'
-  >,
+  userProfile: Pick<Tables<'user_profile'>, 'user_profile_id'>,
 ) => {
-  if (!userProfile.phone_number)
-    throw new Error('User profile does not have a phone number')
-
-  const chatChannelId = createChatChannelName(userProfile.chat_id, companyId)
+  // const chatChannelId = createChatChannelName(userProfile.chat_id, companyId)
 
   const addToQueueDB = async (companyId: number, userProfileId: number) => {
     return await supabaseClient.from('queuedetails').insert({
       queue_id: companyId,
       user_profile_id: userProfileId,
-      chat_channel_id: chatChannelId,
+      // chat_channel_id: chatChannelId,
     })
   }
 

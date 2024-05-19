@@ -28,6 +28,7 @@ const addRestaurantDetailsAddons = (
 const restaurantNameQueryParamSchema = z.string()
 
 const queueDetailSchema = z.object({
+  user_profile_id: z.number(),
   name: z.string(),
   phone_number: z.string(),
   position: z.number(),

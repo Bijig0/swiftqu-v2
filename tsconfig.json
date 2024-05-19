@@ -27,6 +27,6 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "src/app/api/queueDetails"
-  ],
+, "src/app/api/adminSeatUser"  ],
   "exclude": ["node_modules", ".next", "out"]
 }

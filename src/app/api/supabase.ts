@@ -16,3 +16,4 @@ export const createAuthorizedAdminSupabaseClient = (authKey: string) => {
 
   return client
 }
+

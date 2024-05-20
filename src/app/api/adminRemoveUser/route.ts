@@ -23,6 +23,7 @@ const userToInteractWithSchema = z.object({
 const adminQueueActionSchema = z.object({
   eventName: z.string(),
   data: z.object({
+    // adminRealtimeChannelName: z.string(),
     companyId: z.number(),
     socketId: z.string(),
     userToInteractWith: userToInteractWithSchema,
@@ -45,11 +46,14 @@ export async function POST(request: Request, params: unknown) {
     if (!authKey) throw new Error('No auth header')
 
     const supabaseClient = createAuthorizedAdminSupabaseClient(authKey)
+
     const adminSupabaseClient = createAdminSupabaseClient()
 
     const body = await request.json()
 
     const queueAction = adminQueueActionSchema.parse(body)
+
+    console.log({ queueAction })
 
     const companyId = queueAction.data.companyId
 
@@ -142,7 +146,7 @@ export async function POST(request: Request, params: unknown) {
     await removeUserFromQueue()
     // await alertUserOfSuccessfulLeave()
     // await alertOtherUsersOfSuccessfulLeave()
-    // await alertRestaurantOfSuccessfulLeave()
+    await alertRestaurantOfSuccessfulLeave()
 
     return Response.json({ result: `ok` }, { headers: corsHeaders })
   } catch (error) {

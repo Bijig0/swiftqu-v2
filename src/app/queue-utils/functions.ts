@@ -3,7 +3,6 @@ import { TriggerParams } from 'pusher'
 import { initPusher } from '../api/utils/pusher'
 import { Database, Tables } from '../types/supabase'
 import { QueueEventResponse } from './types'
-import getOrCreateAdminChannelName from './utils/getOrCreateAdminChannelName'
 
 const pusher = initPusher()
 
@@ -68,14 +67,20 @@ export const addUserToQueue = async (
   if (queueDetailsError) throw queueDetailsError
 }
 
-export const alertRestaurantOfSuccessfulJoin = async (companyId: number) => {
+type AlertRestaurantOfSuccessfulJoinParams = {
+  restaurantChannelName: string
+  companyId: number
+}
+
+export const alertRestaurantOfSuccessfulJoin = async (
+  params: AlertRestaurantOfSuccessfulJoinParams,
+) => {
+  const { restaurantChannelName, companyId } = params
   const joinQueueResponse = {
     actionType: 'join-queue',
     companyId: companyId,
     status: 'success',
   } satisfies QueueEventResponse
 
-  const adminChannelName = getOrCreateAdminChannelName(companyId)
-
-  triggerQueueEvent(adminChannelName, 'join-queue', joinQueueResponse)
+  triggerQueueEvent(restaurantChannelName, 'join-queue', joinQueueResponse)
 }

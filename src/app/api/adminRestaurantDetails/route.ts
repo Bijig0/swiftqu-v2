@@ -1,7 +1,4 @@
 import { assertNotUndefined } from '@/app/queue-utils/utils/assertNotUndefined'
-import createQueueChannelName from '@/app/queue-utils/utils/createQueueChannelName'
-import getOrCreateAdminChannelName from '@/app/queue-utils/utils/getOrCreateAdminChannelName'
-import getOrCreateUserChannelName from '@/app/queue-utils/utils/getOrCreateUserChannelName'
 import { z } from 'zod'
 import { createAuthorizedAdminSupabaseClient } from '../supabase'
 import { corsHeaders } from '../utils/cors'
@@ -11,7 +8,6 @@ export { OPTIONS } from '../utils/cors'
 const addRestaurantDetailsAddons = (
   restaurantDetails: any,
   pusherQueueChannelName: string,
-  pusherIndividualQueueChannelName: string,
 ): any => {
   const addQueueDetailsURL = (restaurantDetails: any) => {
     const queueDetailsURL = `/queueDetail?queueId=${restaurantDetails.id}`
@@ -21,7 +17,6 @@ const addRestaurantDetailsAddons = (
   return addQueueDetailsURL({
     ...restaurantDetails,
     pusherQueueChannelName,
-    pusherIndividualQueueChannelName,
   })
 }
 
@@ -92,6 +87,8 @@ export async function GET(request: Request, params: unknown) {
 
     assertNotUndefined(userProfile)
 
+    console.log({ parsedRestaurantName })
+
     const { data: restaurantDetails, error } = await supabaseClient
       .rpc('get_restaurant_details', { company_name: parsedRestaurantName })
       .single()
@@ -100,22 +97,15 @@ export async function GET(request: Request, params: unknown) {
 
     if (error) throw error
 
-    const queueChannelName = createQueueChannelName(restaurantDetails.id)
-
-    const individualQueueChannelName = getOrCreateUserChannelName(
-      restaurantDetails.id,
-      user.id,
-    )
+    const queueChannelName = restaurantDetails.queue_realtime_channel_name
 
     const withAddOns = addRestaurantDetailsAddons(
       restaurantDetails,
       queueChannelName,
-      individualQueueChannelName,
     )
 
-    const pusherAdminQueueChannelName = getOrCreateAdminChannelName(
-      restaurantDetails.id,
-    )
+    const pusherAdminQueueChannelName =
+      restaurantDetails.admin_realtime_channel_name
 
     const withAdminQueueChannelName = {
       ...withAddOns,

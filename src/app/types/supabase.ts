@@ -29,18 +29,24 @@ export type Database = {
       }
       queue: {
         Row: {
+          admin_realtime_channel_name: string | null
           company_id: number
           estimated_wait_time: number | null
+          queue_realtime_channel_name: string | null
           url: string | null
         }
         Insert: {
+          admin_realtime_channel_name?: string | null
           company_id: number
           estimated_wait_time?: number | null
+          queue_realtime_channel_name?: string | null
           url?: string | null
         }
         Update: {
+          admin_realtime_channel_name?: string | null
           company_id?: number
           estimated_wait_time?: number | null
+          queue_realtime_channel_name?: string | null
           url?: string | null
         }
         Relationships: [
@@ -58,18 +64,21 @@ export type Database = {
           chat_channel_id: string | null
           joined_at: string
           queue_id: number
+          realtime_channel_name: string | null
           user_profile_id: number
         }
         Insert: {
           chat_channel_id?: string | null
           joined_at?: string
           queue_id: number
+          realtime_channel_name?: string | null
           user_profile_id: number
         }
         Update: {
           chat_channel_id?: string | null
           joined_at?: string
           queue_id?: number
+          realtime_channel_name?: string | null
           user_profile_id?: number
         }
         Relationships: [
@@ -159,6 +168,7 @@ export type Database = {
           company_id: number
         }
         Returns: {
+          user_profile_id: number
           name: string
           phone_number: string
           joined_at: string
@@ -176,6 +186,8 @@ export type Database = {
           name: string
           estimated_wait_time: number
           queue_length: number
+          admin_realtime_channel_name: string
+          queue_realtime_channel_name: string
         }[]
       }
     }

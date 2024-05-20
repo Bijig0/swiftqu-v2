@@ -22,6 +22,7 @@ const adminQueueActionSchema = z.object({
     companyId: z.number(),
     socketId: z.string(),
     userToInteractWith: userToInteractWithSchema,
+    adminChannelName: z.string(),
   }),
 })
 
@@ -95,14 +96,25 @@ export async function POST(request: Request, params: unknown) {
 
     await addUserToQueue(supabaseClient, companyId, addedUser)
 
-    await alertRestaurantOfSuccessfulJoin(companyId)
+    console.log('Added')
+
+    const restaurantAlertArgs = {
+      restaurantChannelName: queueAction.data.adminChannelName,
+      companyId,
+    }
+
+    await alertRestaurantOfSuccessfulJoin(restaurantAlertArgs)
+
+    console.log('Testing')
 
     return Response.json(
       { detail: 'ok' },
       { status: 200, headers: corsHeaders },
     )
   } catch (error) {
+    console.log(error)
     if (error instanceof Error) {
+      console.error(JSON.stringify(error, null, 2))
       return new Response(error.message, { status: 400, headers: corsHeaders })
     }
   }

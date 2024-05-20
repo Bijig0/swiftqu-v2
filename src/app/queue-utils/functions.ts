@@ -1,3 +1,4 @@
+import { createServerClient } from '@/utils/supabase/supabase'
 import { SupabaseClient, User } from '@supabase/supabase-js'
 import { TriggerParams } from 'pusher'
 import { initPusher } from '../api/utils/pusher'
@@ -76,6 +77,9 @@ export const alertRestaurantOfSuccessfulJoin = async (
   params: AlertRestaurantOfSuccessfulJoinParams,
 ) => {
   const { restaurantChannelName, companyId } = params
+
+  const supabase = createServerClient()
+
   const joinQueueResponse = {
     actionType: 'join-queue',
     companyId: companyId,

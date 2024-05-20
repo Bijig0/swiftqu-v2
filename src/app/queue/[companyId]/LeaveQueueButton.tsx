@@ -1,9 +1,12 @@
 'use client'
+import { useSocketId } from '@/app/queue-utils/useSocketId'
 import { Button } from '@/components/ui/button'
 import { useTransition } from 'react'
 
 const LeaveQueueButton = () => {
   const [isPending, startTransition] = useTransition()
+  const socketId = useSocketId()
+  console.log({ socketId })
 
   const onLeave = async () => {
     startTransition(async () => {

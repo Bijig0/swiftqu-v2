@@ -2,9 +2,6 @@ import { getUserChatId, triggerQueueEvent } from '@/app/queue-utils/functions'
 import { QueueEventResponse } from '@/app/queue-utils/types'
 import { assertNotUndefined } from '@/app/queue-utils/utils/assertNotUndefined'
 import retrieveChatChannelName from '@/app/queue-utils/utils/createChatChannelName'
-import createQueueChannelName from '@/app/queue-utils/utils/createQueueChannelName'
-import getOrCreateAdminChannelName from '@/app/queue-utils/utils/getOrCreateAdminChannelName'
-import getOrCreateUserChannelName from '@/app/queue-utils/utils/getOrCreateUserChannelName'
 import { serverClient } from '@/utils/getstream'
 import { z } from 'zod'
 import {
@@ -26,6 +23,8 @@ const adminQueueActionSchema = z.object({
     companyId: z.number(),
     socketId: z.string(),
     userToInteractWith: userToInteractWithSchema,
+    adminChannelName: z.string(),
+    queueChannelName: z.string(),
   }),
 })
 
@@ -45,26 +44,41 @@ export async function POST(request: Request, params: unknown) {
     if (!authKey) throw new Error('No auth header')
 
     const supabaseClient = createAuthorizedAdminSupabaseClient(authKey)
+
     const adminSupabaseClient = createAdminSupabaseClient()
 
     const body = await request.json()
 
     const queueAction = adminQueueActionSchema.parse(body)
 
+    console.log({ queueAction })
+
     const companyId = queueAction.data.companyId
 
     const { name, userProfileId } = queueAction.data.userToInteractWith
 
+    const adminChannelName = queueAction.data.adminChannelName
+
+    const queueChannelName = queueAction.data.queueChannelName
+
+    const userWhoInitiatedsSocketId = queueAction.data.socketId
+
     const { data: userToInteractWith, error: userToInteractWithError } =
       await adminSupabaseClient
         .from('user_profile')
-        .select('user_profile_id,is_otp_verified')
+        .select(
+          'user_profile_id,is_otp_verified, queuedetails(realtime_channel_name)',
+        )
         .eq('user_profile_id', userProfileId)
         .single()
+
+    console.log({ userToInteractWith, userToInteractWithError })
 
     if (userToInteractWithError) throw userToInteractWithError
 
     const userIsPhoneNumberVerified = userToInteractWith.is_otp_verified
+    const userToInteractWithRealtimeChannelName =
+      userToInteractWith.queuedetails[0].realtime_channel_name!
 
     if (userIsPhoneNumberVerified) {
       //   assertNotUndefined(userToInteractWith.chatId)
@@ -101,12 +115,11 @@ export async function POST(request: Request, params: unknown) {
         status: 'success',
       } satisfies QueueEventResponse
 
-      const userChannelName = getOrCreateUserChannelName(
-        companyId,
-        userToInteractWith.id,
+      triggerQueueEvent(
+        userToInteractWithRealtimeChannelName,
+        'leave-queue',
+        toSend,
       )
-
-      triggerQueueEvent(userChannelName, 'leave-queue', toSend)
     }
 
     const alertOtherUsersOfSuccessfulLeave = async () => {
@@ -116,9 +129,9 @@ export async function POST(request: Request, params: unknown) {
         status: 'success',
       } satisfies QueueEventResponse
 
-      const queueChannelName = createQueueChannelName(companyId)
-
       // Passing in socketId excludes the singular client who we notify through alertClientOfSuccesfulLeave
+
+      // Doesn't sound right, I think this just excludes the restaurant lol
 
       triggerQueueEvent(queueChannelName, 'leave-queue', toSend, {
         socket_id: userWhoInitiatedsSocketId,
@@ -132,15 +145,13 @@ export async function POST(request: Request, params: unknown) {
         status: 'success',
       } satisfies QueueEventResponse
 
-      const adminChannelName = getOrCreateAdminChannelName(companyId)
-
       triggerQueueEvent(adminChannelName, 'leave-queue', toSend)
     }
 
     await removeUserFromQueue()
     // await alertUserOfSuccessfulLeave()
-    // await alertOtherUsersOfSuccessfulLeave()
-    // await alertRestaurantOfSuccessfulLeave()
+    await alertOtherUsersOfSuccessfulLeave()
+    await alertRestaurantOfSuccessfulLeave()
 
     return Response.json({ result: `ok` }, { headers: corsHeaders })
   } catch (error) {

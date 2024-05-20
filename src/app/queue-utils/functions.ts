@@ -68,23 +68,3 @@ export const addUserToQueue = async (
   if (queueDetailsError) throw queueDetailsError
 }
 
-type AlertRestaurantOfSuccessfulJoinParams = {
-  restaurantChannelName: string
-  companyId: number
-}
-
-export const alertRestaurantOfSuccessfulJoin = async (
-  params: AlertRestaurantOfSuccessfulJoinParams,
-) => {
-  const { restaurantChannelName, companyId } = params
-
-  const supabase = createServerClient()
-
-  const joinQueueResponse = {
-    actionType: 'join-queue',
-    companyId: companyId,
-    status: 'success',
-  } satisfies QueueEventResponse
-
-  triggerQueueEvent(restaurantChannelName, 'join-queue', joinQueueResponse)
-}

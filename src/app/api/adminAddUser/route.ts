@@ -1,7 +1,5 @@
-import {
-  addUserToQueue,
-  alertRestaurantOfSuccessfulJoin,
-} from '@/app/queue-utils/functions'
+import { alertRestaurantOfSuccessfulJoin } from '@/app/queue-utils/alertRestaurantOfSuccessfulJoin'
+import { addUserToQueue } from '@/app/queue-utils/functions'
 import { z } from 'zod'
 import {
   createAdminSupabaseClient,
@@ -98,12 +96,7 @@ export async function POST(request: Request, params: unknown) {
 
     console.log('Added')
 
-    const restaurantAlertArgs = {
-      restaurantChannelName: queueAction.data.adminChannelName,
-      companyId,
-    }
-
-    await alertRestaurantOfSuccessfulJoin(restaurantAlertArgs)
+    await alertRestaurantOfSuccessfulJoin(companyId)
 
     console.log('Testing')
 

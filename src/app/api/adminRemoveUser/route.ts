@@ -1,14 +1,14 @@
-import { getUserChatId, triggerQueueEvent } from '@/app/queue-utils/functions'
-import { QueueEventResponse } from '@/app/queue-utils/types'
-import { assertNotUndefined } from '@/app/queue-utils/utils/assertNotUndefined'
-import retrieveChatChannelName from '@/app/queue-utils/utils/createChatChannelName'
-import { serverClient } from '@/utils/getstream'
 import { z } from 'zod'
 import {
   createAdminSupabaseClient,
   createAuthorizedAdminSupabaseClient,
 } from '../supabase'
 import { corsHeaders } from '../utils/cors'
+import { getUserChatId, triggerQueueEvent } from '../../queue-utils/functions'
+import { QueueEventResponse } from '../../queue-utils/types'
+import { assertNotUndefined } from '../../queue-utils/utils/assertNotUndefined'
+import retrieveChatChannelName from '../../queue-utils/utils/createChatChannelName'
+import { serverClient } from '../../queue-utils/utils/getstream'
 
 export { OPTIONS } from '../utils/cors'
 

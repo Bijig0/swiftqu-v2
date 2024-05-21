@@ -1,4 +1,3 @@
-import Urls from '@/app/urls/urls'
 import {
   Card,
   CardContent,
@@ -6,11 +5,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import MainForm from '../../form'
-import checkUserInQueue from './checkUserInQueue'
 import getRestaurantData from './getRestaurantData'
+import Urls from '@/app/urls/urls'
+import { redirect } from 'next/navigation'
+import checkUserInQueue from './checkUserInQueue'
 
 const paramsSchema = z.object({
   params: z.object({
@@ -31,7 +31,7 @@ export default async function Index(params: unknown) {
     redirect(Urls.queue(companyId))
   }
 
-  console.log({ isUserInQueue })
+  // console.log({ isUserInQueue })
 
   const restaurantData = await getRestaurantData(companyId)
 
@@ -43,9 +43,9 @@ export default async function Index(params: unknown) {
       <img
         src={image_url ?? ''}
         alt="Restaurant banner"
-        className="object-cover w-full rounded-lg h-36"
+        className="h-36 w-full rounded-lg object-cover"
       />
-      <Card className="w-full mx-auto">
+      <Card className="mx-auto w-full">
         <CardHeader>
           <CardTitle className="text-2xl">Queue Up</CardTitle>
           <CardDescription>
@@ -56,7 +56,7 @@ export default async function Index(params: unknown) {
           <MainForm companyId={companyId} />
         </CardContent>
       </Card>
-      <p className="self-start text-sm text-gray-500 justify-self-end">
+      <p className="self-start justify-self-end text-sm text-gray-500">
         Powered by <span className="underline">SwiftQu</span> - Virtusl Queues
         Made Easy
       </p>

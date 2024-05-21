@@ -1,3 +1,4 @@
+'use server'
 import { createServerClient } from '@/utils/supabase/supabase'
 
 const getCompanyData = async (companyId: number) => {
@@ -12,7 +13,6 @@ const getCompanyData = async (companyId: number) => {
     if (error) throw error
 
     return restaurantDetails
-    
   } catch (error) {
     throw error
   }

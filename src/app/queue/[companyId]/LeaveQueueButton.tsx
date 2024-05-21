@@ -1,26 +1,39 @@
 'use client'
+import leaveQueue from '@/app/queue/[companyId]/leaveQueue'
 import { useSocketId } from '@/app/queue-utils/useSocketId'
 import { Button } from '@/components/ui/button'
 import { useTransition } from 'react'
 
-const LeaveQueueButton = () => {
-  const [isPending, startTransition] = useTransition()
-  const socketId = useSocketId()
+type Props = {
+  companyId: number
+  userChannelName: string
+}
+
+const LeaveQueueButton = (props: Props) => {
+  const { companyId, userChannelName } = props
+  const [isLeaving, startTransition] = useTransition()
+  const { isPending: isSocketIdPending, socketId } = useSocketId()
+
+  const isPending = isSocketIdPending || isLeaving
+
   console.log({ socketId })
 
   const onLeave = async () => {
     startTransition(async () => {
-      const toSend = {
-        eventName: 'leave-queue',
-        data: {
-          socketId: socketId,
-          companyId: companyId,
-        },
-      } satisfies QueueActionSchema
+      if (isSocketIdPending) {
+        await new Promise((resolve) => {
+          const interval = setInterval(async () => {
+            if (!isSocketIdPending) {
+              clearInterval(interval)
+              resolve('')
+            }
+          })
+        })
+      }
 
-      leaveQueueMutate(toSend)
+      leaveQueue(companyId, socketId!, userChannelName)
 
-      setIsJoined(false)
+      // setIsJoined(false)
     })
   }
 

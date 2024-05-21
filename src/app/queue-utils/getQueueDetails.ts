@@ -1,3 +1,4 @@
+'use server'
 import { createServerClient } from '@/utils/supabase/supabase'
 import { redirect } from 'next/navigation'
 import { Tables } from '../types/supabase'

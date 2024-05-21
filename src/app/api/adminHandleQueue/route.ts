@@ -1,25 +1,23 @@
-import {
-  addUserToQueue,
-  alertRestaurantOfSuccessfulJoin,
-  getUserChatId,
-  triggerQueueEvent,
-} from '@/app/queue-utils/functions'
-import { QueueEventResponse } from '@/app/queue-utils/types'
-import { assertNotUndefined } from '@/app/queue-utils/utils/assertNotUndefined'
-import retrieveChatChannelName from '@/app/queue-utils/utils/createChatChannelName'
-import createQueueChannelName from '@/app/queue-utils/utils/createQueueChannelName'
-import getOrCreateAdminChannelName from '@/app/queue-utils/utils/getOrCreateAdminChannelName'
-import getOrCreateUserChannelName from '@/app/queue-utils/utils/getOrCreateUserChannelName'
-import { serverClient } from '@/utils/getstream'
 import { objectToCamel, objectToSnake } from 'ts-case-convert'
 import { z } from 'zod'
+import { alertRestaurantOfSuccessfulJoin } from '../../queue-utils/alertRestaurantOfSuccessfulJoin'
+import {
+  addUserToQueue,
+  getUserChatId,
+  triggerQueueEvent,
+} from '../../queue-utils/functions'
+import { QueueEventResponse } from '../../queue-utils/types'
+import { assertNotUndefined } from '../../queue-utils/utils/assertNotUndefined'
+import retrieveChatChannelName from '../../queue-utils/utils/createChatChannelName'
+import createQueueChannelName from '../../queue-utils/utils/createQueueChannelName'
+import getOrCreateAdminChannelName from '../../queue-utils/utils/getOrCreateAdminChannelName'
+import getOrCreateUserChannelName from '../../queue-utils/utils/getOrCreateUserChannelName'
+import { serverClient } from '../../queue-utils/utils/getstream'
 import {
   createAdminSupabaseClient,
   createAuthorizedAdminSupabaseClient,
 } from '../supabase'
 import { corsHeaders } from '../utils/cors'
-
-export { OPTIONS } from '../utils/cors'
 
 const userToInteractWithSchema = z.object({
   name: z.string(),

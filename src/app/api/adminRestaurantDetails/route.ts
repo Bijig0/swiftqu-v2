@@ -1,5 +1,5 @@
-import { assertNotUndefined } from '@/app/queue-utils/utils/assertNotUndefined'
 import { z } from 'zod'
+import { assertNotUndefined } from '../../queue-utils/utils/assertNotUndefined'
 import { createAuthorizedAdminSupabaseClient } from '../supabase'
 import { corsHeaders } from '../utils/cors'
 

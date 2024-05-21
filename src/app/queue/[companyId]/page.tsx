@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Heading from '@/components/ui/heading'
 import { z } from 'zod'
-import LeaveQueueButton from './LeaveQueueButton'
+import LeaveQueueManager from './LeaveQueueManager'
 
 const paramsSchema = z.object({
   params: z.object({
@@ -29,7 +29,7 @@ export default async function Index(params: unknown) {
 
   const queueDetails = await getQueueDetails(companyId)
 
-  const { position } = queueDetails
+  const { position, realtime_channel_name: userChannelName } = queueDetails
 
   const { name, image_url } = restaurantData
 
@@ -39,11 +39,11 @@ export default async function Index(params: unknown) {
       <img
         src={image_url ?? ''}
         alt="Restaurant banner"
-        className="object-cover rounded-lg"
+        className="h-36 w-full rounded-lg object-cover"
       />
-      <Card className="flex items-center justify-center w-full mx-auto">
+      <Card className="mx-auto flex w-full items-center justify-center">
         <CardContent className="flex items-center justify-center py-16">
-          <h1 className="text-5xl font-bold text-center font-primary-medium sm:text-6xl">
+          <h1 className="font-primary-medium text-center text-5xl font-bold sm:text-6xl">
             {position}{' '}
             <span className="block text-lg font-light text-gray-500">
               in queue
@@ -51,11 +51,14 @@ export default async function Index(params: unknown) {
           </h1>
         </CardContent>
       </Card>
-      <div className="flex w-full gap-4 justify-evenly">
+      <div className="flex w-full justify-evenly gap-4">
         <Button size={'lg'} className="flex-1 bg-blue-600">
           Chat With Us
         </Button>
-        <LeaveQueueButton />
+        <LeaveQueueManager
+          companyId={companyId}
+          userChannelName={userChannelName!}
+        />
       </div>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem className="no-underline" value="item-1">
@@ -73,7 +76,7 @@ export default async function Index(params: unknown) {
         </AccordionItem>
       </Accordion>
 
-      <p className="self-start text-sm text-gray-500 justify-self-end">
+      <p className="self-start justify-self-end text-sm text-gray-500">
         Powered by <span className="underline">SwiftQu</span> - Virtusl Queues
         Made Easy
       </p>

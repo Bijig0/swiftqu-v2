@@ -1,6 +1,15 @@
 import { usePusher } from '@/use-pusher/usePusher'
 import { useEffect, useState } from 'react'
 
+const connectionStates = ['connected', 'connecting', 'rejected'] as const
+
+type ConnectionState = (typeof connectionStates)[number]
+
+type BoundStates = {
+  current: ConnectionState
+  prev: ConnectionState
+}
+
 /**
  * Provides access to the pusher client instance.
  *
@@ -13,16 +22,28 @@ import { useEffect, useState } from 'react'
  */
 export function useSocketId() {
   const pusher = usePusher()
-  const [socketId, setSocketId] = useState<string | undefined>(undefined)
-  console.log({ pusher })
-  const connectionState = pusher.client?.connection?.state
+  // const connectionState = pusher.client?.connection.state;
+  const [isPending, setIsPending] = useState(true)
+
+  const [socketId, setSocketId] = useState<string | null>(null)
+
   useEffect(() => {
-    console.log({ connectionState })
-    const socketId = pusher.client?.connection?.socket_id
-    console.log({ socketId })
-    if (connectionState !== 'connected') return
-    console.log({ connectionState })
-    setSocketId(socketId)
-  }, [connectionState])
-  return socketId
+    if (pusher.client === undefined) return
+
+    pusher.client.connection.bind('state_change', (states: BoundStates) => {
+      if (pusher.client === undefined)
+        throw new Error('Pusher client not set (it is undefined)')
+      if (states.current === 'connected') {
+        const socketIdToSet = pusher.client.connection.socket_id
+        console.log(`Setting socket id ${socketIdToSet}`)
+        setSocketId(socketIdToSet)
+        console.log(`Set socket id ${socketIdToSet}`)
+        setIsPending(false)
+      } else if (states.current === 'rejected') {
+        throw new Error('Pusher connection rejected')
+      }
+    })
+  }, [pusher])
+
+  return { socketId, isPending }
 }

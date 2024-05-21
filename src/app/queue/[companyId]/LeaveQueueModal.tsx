@@ -9,20 +9,27 @@ import {
 } from '@/components/ui/dialog'
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
 
-export default function LeaveQueueModal() {
+type Props = {
+  closeModal: () => void
+  isOpen: boolean
+  onLeave: () => void
+}
+
+export default function LeaveQueueModal(props: Props) {
+  const { closeModal, isOpen, onLeave } = props
   return (
-    <Dialog open={true}>
+    <Dialog open={isOpen}>
       <DialogContent className="w-10/12 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-center">
-            <HiOutlineExclamationCircle className="text-7xl text-red-700" />
+            <HiOutlineExclamationCircle className="text-red-700 text-7xl" />
           </DialogTitle>
-          <DialogDescription className="text-md text-gray-500">
+          <DialogDescription className="text-gray-500 text-md">
             Are you sure you want to leave the queue?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-row justify-center gap-4">
-          <Button className="rounded-md bg-red-700 text-white">
+          <Button className="text-white bg-red-700 rounded-md">
             Yes, I'm sure
           </Button>
           <Button className="rounded-md">No, cancel</Button>

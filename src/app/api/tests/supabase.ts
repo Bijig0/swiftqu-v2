@@ -1,3 +1,4 @@
+// Setup for the test supabase project/server
 import { Database } from '@/app/types/supabase'
 import { createClient } from '@supabase/supabase-js'
 

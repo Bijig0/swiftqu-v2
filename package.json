@@ -47,6 +47,7 @@
     "class-variance-authority": "^0.7.0",
     "clicksend": "^5.0.79",
     "clsx": "^2.1.0",
+    "efate": "^1.5.1",
     "effect": "^3.1.2",
     "embla-carousel-react": "^8.0.2",
     "geist": "^1.0.0",

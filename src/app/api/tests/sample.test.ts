@@ -1,8 +1,11 @@
 import { testApiHandler } from 'next-test-api-route-handler' // ◄ Must be first import
 // import {GET} from '../adminHandleQueue/route'
-import { POST } from '../adminHandleQueue/route'
+import { POST } from '../adminRemoveUser/route'
+import { setup } from './setup'
+setup
 
 // import { beforeEach, describe, expect, it } from 'bun:test'
+import { adminQueueActionFixture } from './fixtures'
 import { createAdminSupabaseClient } from './supabase'
 
 const clearDatabase = async () => {
@@ -12,32 +15,27 @@ const clearDatabase = async () => {
   if (error) throw error
 }
 
-// describe('adminProfileDetails endpoint', () => {
-//   beforeEach(async () => {
-//     await clearDatabase()
-//   })
-//   it('retrieves admin profile details', async () => {
-//     await testApiHandler({
-//       appHandler: { GET },
-//       async test({ fetch }) {
-//         const response = await fetch({ method: 'GET' })
-//         expect(1).toEqual(1)
-//       },
-//     })
-//   })
-// })
-
-// describe('adminHandleQueue endpoint', () => {
-//   beforeEach(async () => {
-//     await clearDatabase()
-//   })
-//   it('removes user if first in queue', async () => {
-//     await testApiHandler({
-//       appHandler: { POST },
-//       async test({ fetch }) {
-//         const response = await fetch({ method: 'POST', body: "", p })
-//         expect(1).toEqual(1)
-//       },
-//     })
-//   })
-// })
+describe('adminRemoveUser endpoint', () => {
+  beforeEach(async () => {
+    console.log('Clearing database')
+    await clearDatabase()
+    console.log('Cleared database')
+  })
+  it('removes user if first in queue', async () => {
+    await testApiHandler({
+      appHandler: { POST },
+      requestPatcher: (req) => {
+        req.headers.set('authorization', 'auth')
+      },
+      async test({ fetch }) {
+        const removeUserAction = adminQueueActionFixture.create()
+        const response = await fetch({
+          method: 'POST',
+          body: JSON.stringify(removeUserAction),
+        })
+        console.log({ response })
+        expect(1).toEqual(1)
+      },
+    })
+  })
+})

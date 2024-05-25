@@ -1,41 +1,16 @@
-import { z } from 'zod'
-import {
-  createAdminSupabaseClient,
-  createAuthorizedAdminSupabaseClient,
-} from '../supabase'
-import { corsHeaders } from '../utils/cors'
 import { getUserChatId, triggerQueueEvent } from '../../queue-utils/functions'
 import { QueueEventResponse } from '../../queue-utils/types'
 import { assertNotUndefined } from '../../queue-utils/utils/assertNotUndefined'
 import retrieveChatChannelName from '../../queue-utils/utils/createChatChannelName'
 import { serverClient } from '../../queue-utils/utils/getstream'
+import {
+  createAdminSupabaseClient,
+  createAuthorizedAdminSupabaseClient,
+} from '../supabase'
+import { corsHeaders } from '../utils/cors'
+import { adminQueueActionSchema } from '../utils/types'
 
 export { OPTIONS } from '../utils/cors'
-
-const userToInteractWithSchema = z.object({
-  name: z.string(),
-  userProfileId: z.number(),
-})
-
-const adminQueueActionSchema = z.object({
-  eventName: z.string(),
-  data: z.object({
-    companyId: z.number(),
-    socketId: z.string(),
-    userToInteractWith: userToInteractWithSchema,
-    adminChannelName: z.string(),
-    queueChannelName: z.string(),
-  }),
-})
-
-type UserToInteractWith = {
-  chatId: string | null
-  name: string | null
-  phoneNumber: string | null
-  id: string
-  userProfileId: number
-  isOtpVerified: boolean
-}
 
 export async function POST(request: Request, params: unknown) {
   try {
@@ -47,7 +22,11 @@ export async function POST(request: Request, params: unknown) {
 
     const adminSupabaseClient = createAdminSupabaseClient()
 
+    console.log('Test')
+
     const body = await request.json()
+
+    console.log('Second Test')
 
     const queueAction = adminQueueActionSchema.parse(body)
 
